@@ -3,7 +3,9 @@ FROM golang:1.18.2-alpine3.16 AS builder
 WORKDIR /usr/src/app
 COPY go.mod go.sum ./
 RUN go mod download
+COPY cli/ cli/
 COPY cmd/ cmd/
+COPY webhook/ webhook/
 COPY handler/ handler/
 COPY provider/ provider/
 COPY util/ util/
