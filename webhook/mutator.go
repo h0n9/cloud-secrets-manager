@@ -69,6 +69,7 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 			{Name: "TEMPLATE_BASE64", Value: util.EncodeBase64(tmplStr)},
 			{Name: "OUTPUT_FILE", Value: output},
 		},
+		Args: []string{"injector", "run"},
 		VolumeMounts: []corev1.VolumeMount{
 			{
 				Name:      volumeName,
