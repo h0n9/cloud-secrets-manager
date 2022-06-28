@@ -14,8 +14,9 @@ import (
 )
 
 type Mutator struct {
-	Client  client.Client
-	decoder *admission.Decoder
+	Client        client.Client
+	InjectorImage string
+	decoder       *admission.Decoder
 }
 
 func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admission.Response {
@@ -61,7 +62,7 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 
 	// inject sidecar
 	pod.Spec.InitContainers = append(pod.Spec.InitContainers, corev1.Container{
-		Image: "ghcr.io/h0n9/cloud-secrets-manager:v0.0.1",
+		Image: mutator.InjectorImage,
 		Env: []corev1.EnvVar{
 			{Name: "PROVIDER_NAME", Value: providerStr},
 			{Name: "SECRET_ID", Value: secretID},

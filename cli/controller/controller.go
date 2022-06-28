@@ -19,6 +19,8 @@ var Cmd = &cobra.Command{
 	Short: "admission webhook controller",
 }
 
+var injectorImage string
+
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "run a server for managing admission webhooks",
@@ -34,7 +36,8 @@ var runCmd = &cobra.Command{
 
 		hookServer := mgr.GetWebhookServer()
 		hookServer.Register("/mutate", &webhook.Admission{Handler: &csiWebhook.Mutator{
-			Client: mgr.GetClient(),
+			Client:        mgr.GetClient(),
+			InjectorImage: injectorImage,
 		}})
 		hookServer.Register("/validate", &webhook.Admission{Handler: &csiWebhook.Validator{
 			Client: mgr.GetClient(),
@@ -51,5 +54,11 @@ var runCmd = &cobra.Command{
 }
 
 func init() {
+	runCmd.Flags().StringVar(
+		&injectorImage,
+		"image",
+		"ghcr.io/h0n9/cloud-secrets-manager:v0.0.1",
+		"docker image name with tag for init container",
+	)
 	Cmd.AddCommand(runCmd)
 }
