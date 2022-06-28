@@ -5,15 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
-	"text/template"
+	"path/filepath"
 
+	"github.com/h0n9/toybox/cloud-secrets-manager/util"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
-
-	"github.com/h0n9/toybox/cloud-secrets-manager/handler"
-	"github.com/h0n9/toybox/cloud-secrets-manager/provider"
 )
 
 type Mutator struct {
@@ -55,39 +52,42 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
-	tmpl := template.New("cloud-secrets-injector")
-	tmpl, err = tmpl.Parse(tmplStr)
-	if err != nil {
-		return admission.Errored(http.StatusBadRequest, err)
+	// append 'cloud-secrets-injector' volume to pod volumes
+	volumeName := "cloud-secrets-injector"
+	pod.Spec.Volumes = append(pod.Spec.Volumes, corev1.Volume{
+		Name:         volumeName,
+		VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
+	})
+
+	// inject sidecar
+	pod.Spec.InitContainers = append(pod.Spec.InitContainers, corev1.Container{
+		Image: "ghcr.io/h0n9/cloud-secrets-manager:v0.0.1",
+		Env: []corev1.EnvVar{
+			{Name: "PROVIDER_NAME", Value: providerStr},
+			{Name: "SECRET_ID", Value: secretID},
+			{Name: "TEMPLATE_BASE64", Value: util.EncodeBase64(tmplStr)},
+			{Name: "OUTPUT_FILE", Value: output},
+		},
+		VolumeMounts: []corev1.VolumeMount{
+			{
+				Name:      volumeName,
+				MountPath: filepath.Dir(output),
+			},
+		},
+	})
+
+	// mount volume to every containers
+	for _, container := range pod.Spec.Containers {
+		container.VolumeMounts = append(container.VolumeMounts, corev1.VolumeMount{
+			Name:      volumeName,
+			MountPath: filepath.Dir(output),
+		})
 	}
 
-	var (
-		secretProvider provider.SecretProvider
-		secretHandler  *handler.SecretHandler
-	)
-
-	switch strings.ToLower(providerStr) {
-	case "aws":
-		secretProvider, err = provider.NewAWS(ctx)
-		if err != nil {
-			return admission.Errored(http.StatusBadRequest, err)
-		}
-	default:
-		err = fmt.Errorf("failed to figure out secret provider")
-		return admission.Errored(http.StatusBadRequest, err)
-	}
-
-	secretHandler, err = handler.NewSecretHandler(secretProvider, tmpl)
-	if err != nil {
-		return admission.Errored(http.StatusInternalServerError, err)
-	}
-
-	err = secretHandler.Save(secretID, output)
-	if err != nil {
-		return admission.Errored(http.StatusInternalServerError, err)
-	}
-
+	// set annotation for injection to true
 	pod.Annotations[fmt.Sprintf("%s/%s", AnnotationPrefix, "injected")] = "true"
+
+	// marshal pod struct into bytes slice
 	data, err := json.Marshal(pod)
 	if err != nil {
 		return admission.Errored(http.StatusInternalServerError, err)
