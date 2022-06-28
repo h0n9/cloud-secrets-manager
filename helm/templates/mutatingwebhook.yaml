@@ -1,0 +1,28 @@
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: {{ include "cloud-secrets-controller.fullname" . }}
+  labels:
+    {{- include "cloud-secrets-controller.labels" . | nindent 4 }}
+webhooks:
+  - clientConfig:
+      service:
+        name: {{ include "cloud-secrets-controller.fullname" . }}
+        path: /mutate
+        port: {{ .Values.service.port }}
+        namespace: {{ .Release.Namespace }} 
+    sideEffects: None
+    admissionReviewVersions: ["v1beta1"]
+    failurePolicy: Fail
+    name: {{ include "cloud-secrets-controller.fullname" . }}
+    rules:
+    - apiGroups:
+      - ""
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - pods
+      scope: "Namespaced"
