@@ -19,14 +19,19 @@ var Cmd = &cobra.Command{
 	Short: "admission webhook controller",
 }
 
-var injectorImage string
+var (
+	port          int
+	injectorImage string
+)
 
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "run a server for managing admission webhooks",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.SetLogger(zap.New())
-		logger := log.Log.WithName("cloud-secrets-injector-controller")
+		logger := log.Log.WithName("cloud-secrets-controller")
+
+		// TODO: generate self-signed CA certificate
 
 		mgr, err := manager.New(config.GetConfigOrDie(), manager.Options{Logger: logger})
 		if err != nil {
@@ -44,6 +49,8 @@ var runCmd = &cobra.Command{
 		}})
 		logger.Info("registered mutate, validator handlers to /mutate, /validate webhook uris")
 
+		hookServer.Port = port
+
 		logger.Info("starting controller")
 		err = mgr.Start(signals.SetupSignalHandler())
 		if err != nil {
@@ -54,6 +61,12 @@ var runCmd = &cobra.Command{
 }
 
 func init() {
+	runCmd.Flags().IntVar(
+		&port,
+		"port",
+		8443,
+		"port for webhook server to listen on",
+	)
 	runCmd.Flags().StringVar(
 		&injectorImage,
 		"image",
