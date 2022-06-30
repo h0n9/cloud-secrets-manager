@@ -44,3 +44,7 @@ func GenerateCACertificate() ([]byte, error) {
 	}
 	return caBytes, nil
 }
+
+func GenerateCertificate() ([]byte, error) {
+	return nil, nil
+}
