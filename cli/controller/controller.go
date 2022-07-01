@@ -11,6 +11,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
+	"github.com/h0n9/toybox/cloud-secrets-manager/util"
 	csiWebhook "github.com/h0n9/toybox/cloud-secrets-manager/webhook"
 )
 
@@ -20,7 +21,10 @@ var Cmd = &cobra.Command{
 }
 
 var (
+	service       string
+	namespace     string
 	port          int
+	certDir       string
 	injectorImage string
 )
 
@@ -29,9 +33,15 @@ var runCmd = &cobra.Command{
 	Short: "run a server for managing admission webhooks",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.SetLogger(zap.New())
-		logger := log.Log.WithName("cloud-secrets-controller")
+		logger := log.Log.WithName(service)
 
-		// TODO: generate self-signed CA certificate
+		// generate self-signed CA certificate
+		err := util.GenerateAndSaveCertificate(service, namespace, certDir)
+		if err != nil {
+			logger.Error(err, "faild to generate and save certificate")
+			os.Exit(1)
+		}
+		logger.Info("generated and saved certificates to " + certDir)
 
 		mgr, err := manager.New(config.GetConfigOrDie(), manager.Options{Logger: logger})
 		if err != nil {
@@ -50,6 +60,7 @@ var runCmd = &cobra.Command{
 		logger.Info("registered mutate, validator handlers to /mutate, /validate webhook uris")
 
 		hookServer.Port = port
+		hookServer.CertDir = certDir
 
 		logger.Info("starting controller")
 		err = mgr.Start(signals.SetupSignalHandler())
@@ -61,11 +72,29 @@ var runCmd = &cobra.Command{
 }
 
 func init() {
+	runCmd.Flags().StringVar(
+		&service,
+		"service",
+		"cloud-secrets-controller",
+		"kubernetes service resource's name",
+	)
+	runCmd.Flags().StringVar(
+		&namespace,
+		"namespace",
+		"cloud-secrets-controller",
+		"kubernetes service resource's namespace",
+	)
 	runCmd.Flags().IntVar(
 		&port,
 		"port",
 		8443,
 		"port for webhook server to listen on",
+	)
+	runCmd.Flags().StringVar(
+		&certDir,
+		"cert-dir",
+		"/etc/certs",
+		"directory containing certificate and private key files",
 	)
 	runCmd.Flags().StringVar(
 		&injectorImage,

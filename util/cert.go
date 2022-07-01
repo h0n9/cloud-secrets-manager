@@ -45,7 +45,7 @@ func GenerateAndSaveCertificate(service, namespace, certDir string) error {
 	caCertBytes, err := x509.CreateCertificate(
 		rand.Reader,
 		ca, ca,
-		caPrivKey.Public(), caPrivKey,
+		&caPrivKey.PublicKey, caPrivKey,
 	)
 	if err != nil {
 		return err
@@ -57,6 +57,9 @@ func GenerateAndSaveCertificate(service, namespace, certDir string) error {
 		Type:  "CERTIFICATE",
 		Bytes: caCertBytes,
 	})
+	if err != nil {
+		return err
+	}
 
 	cert := &x509.Certificate{
 		DNSNames: []string{
@@ -98,7 +101,7 @@ func GenerateAndSaveCertificate(service, namespace, certDir string) error {
 	serverCertBytes, err := x509.CreateCertificate(
 		rand.Reader,
 		cert, ca,
-		serverPrivKey.PublicKey, caPrivKey,
+		&serverPrivKey.PublicKey, caPrivKey,
 	)
 	if err != nil {
 		return err
@@ -115,7 +118,7 @@ func GenerateAndSaveCertificate(service, namespace, certDir string) error {
 	}
 
 	// write files
-	err = os.MkdirAll(certDir, 0666)
+	err = os.MkdirAll(certDir, 0700)
 	if err != nil {
 		return err
 	}
