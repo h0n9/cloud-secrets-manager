@@ -99,7 +99,7 @@ func init() {
 	runCmd.Flags().StringVar(
 		&injectorImage,
 		"image",
-		"ghcr.io/h0n9/cloud-secrets-manager:v0.0.1",
+		"ghcr.io/h0n9/cloud-secrets-manager:v0.0.2",
 		"docker image name with tag for init container",
 	)
 	Cmd.AddCommand(runCmd)
