@@ -8,7 +8,7 @@ import (
 
 const (
 	Name    = "cloud-secrets-manager"
-	Version = "v0.0.3"
+	Version = "v0.0.4"
 
 	DefaultProviderName   = "aws"
 	DefaultTemplateBase64 = "e3sgcmFuZ2UgJGssICR2IDo9IC4gfX1be3sgJGsgfX1dCnt7ICR2IH19Cgp7eyBlbmQgfX0K"
