@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"net/http"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -34,11 +35,26 @@ var runCmd = &cobra.Command{
 		log.SetLogger(zap.New())
 		logger := log.Log.WithName(service)
 
-		mgr, err := manager.New(config.GetConfigOrDie(), manager.Options{Logger: logger})
+		mgr, err := manager.New(config.GetConfigOrDie(), manager.Options{
+			Logger:                 logger,
+			HealthProbeBindAddress: ":8081",
+			Port:                   port,
+			CertDir:                certDir,
+		})
 		if err != nil {
 			logger.Error(err, "faild to setup controller")
 			os.Exit(1)
 		}
+
+		err = mgr.AddHealthzCheck("healthz", func(req *http.Request) error { return nil })
+		if err != nil {
+			logger.Error(err, "failed to add healthz check")
+		}
+		err = mgr.AddReadyzCheck("readyz", func(req *http.Request) error { return nil })
+		if err != nil {
+			logger.Error(err, "failed to add readyz check")
+		}
+		logger.Info("added healthz, readyz probes")
 
 		hookServer := mgr.GetWebhookServer()
 		hookServer.Register("/mutate", &webhook.Admission{Handler: &csiWebhook.Mutator{
@@ -48,10 +64,6 @@ var runCmd = &cobra.Command{
 		hookServer.Register("/validate", &webhook.Admission{Handler: &csiWebhook.Validator{
 			Client: mgr.GetClient(),
 		}})
-		logger.Info("registered mutate, validator handlers to /mutate, /validate webhook uris")
-
-		hookServer.Port = port
-		hookServer.CertDir = certDir
 
 		logger.Info("starting controller")
 		err = mgr.Start(signals.SetupSignalHandler())
