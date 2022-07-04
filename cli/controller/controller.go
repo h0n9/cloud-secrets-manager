@@ -11,7 +11,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	"github.com/h0n9/toybox/cloud-secrets-manager/util"
 	csiWebhook "github.com/h0n9/toybox/cloud-secrets-manager/webhook"
 )
 
@@ -34,14 +33,6 @@ var runCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		log.SetLogger(zap.New())
 		logger := log.Log.WithName(service)
-
-		// generate self-signed CA certificate
-		err := util.GenerateAndSaveCertificate(service, namespace, certDir)
-		if err != nil {
-			logger.Error(err, "faild to generate and save certificate")
-			os.Exit(1)
-		}
-		logger.Info("generated and saved certificates to " + certDir)
 
 		mgr, err := manager.New(config.GetConfigOrDie(), manager.Options{Logger: logger})
 		if err != nil {
