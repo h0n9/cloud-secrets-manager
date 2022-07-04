@@ -23,11 +23,13 @@ var generateCmd = &cobra.Command{
 	Short: "generate CA, server certificates with private key",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// generate self-signed CA certificate
+		fmt.Printf("generating and saving certificates to %s ... ", certDir)
 		err := util.GenerateAndSaveCertificate(service, namespace, certDir)
 		if err != nil {
-			return fmt.Errorf("faild to generate and save certificate")
+			fmt.Println("❌")
+			return err
 		}
-		fmt.Println("generated and saved certificates to " + certDir)
+		fmt.Println("✅")
 		return nil
 	},
 }
