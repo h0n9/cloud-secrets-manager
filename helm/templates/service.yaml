@@ -10,6 +10,6 @@ spec:
     - port: {{ .Values.service.port }}
       targetPort: 8443
       protocol: TCP
-      name: http
+      name: https
   selector:
     {{- include "cloud-secrets-controller.selectorLabels" . | nindent 4 }}

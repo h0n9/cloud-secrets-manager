@@ -24,6 +24,18 @@ spec:
       serviceAccountName: {{ include "cloud-secrets-controller.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: cert
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - "cert"
+            - "generate"
+          volumeMounts:
+            - name: certs
+              mountPath: /etc/certs
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -34,19 +46,25 @@ spec:
             - "controller"
             - "run"
           ports:
-            - name: http
-              containerPort: 9443
+            - name: https
+              containerPort: 8443
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /mutate
-              port: http
+              path: /healthz
+              port: 8081
           readinessProbe:
             httpGet:
-              path: /mutate
-              port: http
+              path: /readyz
+              port: 8081
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: certs
+              mountPath: /etc/certs
+      volumes:
+        - name: certs
+          emptyDir: {}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
