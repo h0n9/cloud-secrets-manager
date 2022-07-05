@@ -1,10 +1,14 @@
 package controller
 
 import (
+	"context"
 	"net/http"
 	"os"
+	"path"
 
 	"github.com/spf13/cobra"
+	v1 "k8s.io/api/admissionregistration/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -12,6 +16,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
+	"github.com/h0n9/toybox/cloud-secrets-manager/util"
 	csiWebhook "github.com/h0n9/toybox/cloud-secrets-manager/webhook"
 )
 
@@ -44,6 +49,25 @@ var runCmd = &cobra.Command{
 		if err != nil {
 			logger.Error(err, "faild to setup controller")
 			os.Exit(1)
+		}
+		kubeCli := mgr.GetClient()
+		ctx := context.Background()
+
+		// read ca.crt
+		caCertPEM, err := util.ReadFileToStr(path.Join(certDir, "ca.crt"))
+		if err != nil {
+			logger.Error(err, "failed to read 'ca.crt'")
+		}
+		_ = util.EncodeBase64(caCertPEM)
+
+		// get current mutatingWebhookConfiguration
+		mutatingWebhookConfiguration := v1.MutatingWebhookConfiguration{}
+		err = kubeCli.Get(ctx, client.ObjectKey{
+			Namespace: namespace,
+			Name:      service,
+		}, &mutatingWebhookConfiguration)
+		if err != nil {
+			logger.Error(err, "failed to get mutatingWebhookConfiguration")
 		}
 
 		err = mgr.AddHealthzCheck("healthz", func(req *http.Request) error { return nil })
