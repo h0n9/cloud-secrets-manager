@@ -137,16 +137,3 @@ func GenerateAndSaveCertificate(service, namespace, certDir string) error {
 
 	return nil
 }
-
-func WriteFile(path string, data []byte) error {
-	f, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	_, err = f.Write(data)
-	if err != nil {
-		return err
-	}
-	return nil
-}
