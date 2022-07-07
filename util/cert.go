@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-func GenerateAndSaveCertificate(service, namespace, certDir string) error {
+func GenerateAndSaveCertificate(service, namespace, certDir string) ([]byte, error) {
 	now := time.Now()
 	org := []string{
 		"postie.chat",
@@ -38,7 +38,7 @@ func GenerateAndSaveCertificate(service, namespace, certDir string) error {
 	}
 	caPrivKey, err := rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// create CA certificate
@@ -48,7 +48,7 @@ func GenerateAndSaveCertificate(service, namespace, certDir string) error {
 		&caPrivKey.PublicKey, caPrivKey,
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// encode caCert to PEM format
@@ -58,7 +58,7 @@ func GenerateAndSaveCertificate(service, namespace, certDir string) error {
 		Bytes: caCertBytes,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	cert := &x509.Certificate{
@@ -83,7 +83,7 @@ func GenerateAndSaveCertificate(service, namespace, certDir string) error {
 	}
 	serverPrivKey, err := rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	serverPrivKeyBytes := x509.MarshalPKCS1PrivateKey(serverPrivKey)
 
@@ -94,7 +94,7 @@ func GenerateAndSaveCertificate(service, namespace, certDir string) error {
 		Bytes: serverPrivKeyBytes,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// create server certificate
@@ -104,7 +104,7 @@ func GenerateAndSaveCertificate(service, namespace, certDir string) error {
 		&serverPrivKey.PublicKey, caPrivKey,
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// encode serverCert to PEM format
@@ -114,26 +114,26 @@ func GenerateAndSaveCertificate(service, namespace, certDir string) error {
 		Bytes: serverCertBytes,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// write files
 	err = os.MkdirAll(certDir, 0700)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	err = WriteFile(path.Join(certDir, "ca.crt"), caCertPEM.Bytes())
 	if err != nil {
-		return err
+		return nil, err
 	}
 	err = WriteFile(path.Join(certDir, "tls.crt"), serverCertPEM.Bytes())
 	if err != nil {
-		return err
+		return nil, err
 	}
 	err = WriteFile(path.Join(certDir, "tls.key"), serverPrivKeyPEM.Bytes())
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return caCertPEM.Bytes(), nil
 }
