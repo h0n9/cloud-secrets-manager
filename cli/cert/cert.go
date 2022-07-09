@@ -27,17 +27,48 @@ var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "generate CA, server certificates with private key",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// generate self-signed CA certificate
-		fmt.Printf("generating and saving certificates to %s ... ", certDir)
-		caCertPEM, err := util.GenerateAndSaveCertificate(service, namespace, certDir)
+		// init
+		ctx := context.Background()
+		kubeCli := kubernetes.NewForConfigOrDie(config.GetConfigOrDie())
+
+		// get secret for certificates
+		fmt.Printf("getting Secret '%s'... ", service)
+		secret, err := kubeCli.CoreV1().Secrets(namespace).Get(ctx, service, metav1.GetOptions{})
 		if err != nil {
 			fmt.Println("❌")
 			return err
 		}
 		fmt.Println("✅")
 
-		kubeCli := kubernetes.NewForConfigOrDie(config.GetConfigOrDie())
-		ctx := context.Background()
+		var (
+			caCertPEM        []byte
+			serverCertPEM    []byte
+			serverPrivKeyPEM []byte
+		)
+
+		if _, exist := secret.Data["ca.crt"]; !exist {
+			// generate self-signed CA certificate
+			fmt.Printf("generating and saving certificates to %s ... ", certDir)
+			caCertPEM, serverCertPEM, serverPrivKeyPEM, err = util.GenerateCertificate(service, namespace, certDir)
+			if err != nil {
+				fmt.Println("❌")
+				return err
+			}
+			fmt.Println("✅")
+
+			secret.Data["ca.crt"] = caCertPEM
+			secret.Data["tls.crt"] = serverCertPEM
+			secret.Data["tls.key"] = serverPrivKeyPEM
+
+			// update secret for certificates
+			fmt.Printf("updating Secret '%s'... ", service)
+			_, err = kubeCli.CoreV1().Secrets(namespace).Update(ctx, secret, metav1.UpdateOptions{})
+			if err != nil {
+				fmt.Println("❌")
+				return err
+			}
+			fmt.Println("✅")
+		}
 
 		fmt.Printf("getting MutatingWebhookConfiguration ... ")
 		mutatingWebhookConfiguration, err := kubeCli.AdmissionregistrationV1().MutatingWebhookConfigurations().Get(ctx, service, metav1.GetOptions{})
