@@ -33,9 +33,6 @@ spec:
           args:
             - "cert"
             - "generate"
-          volumeMounts:
-            - name: certs
-              mountPath: /etc/certs
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -62,9 +59,12 @@ spec:
           volumeMounts:
             - name: certs
               mountPath: /etc/certs
+              readOnly: true
       volumes:
         - name: certs
-          emptyDir: {}
+          secret:
+            secretName: {{ include "cloud-secrets-controller.fullname" . }}-tls
+            optional: false
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
