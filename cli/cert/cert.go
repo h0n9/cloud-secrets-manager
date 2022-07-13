@@ -41,12 +41,13 @@ var generateCmd = &cobra.Command{
 		fmt.Println("✅")
 
 		var (
-			caCertPEM        []byte
-			serverCertPEM    []byte
-			serverPrivKeyPEM []byte
+			caCertPEM        []byte = secret.Data["ca.crt"]
+			serverCertPEM    []byte = secret.Data["tls.crt"]
+			serverPrivKeyPEM []byte = secret.Data["tls.key"]
 		)
 
-		if _, exist := secret.Data["ca.crt"]; !exist {
+		generate := len(caCertPEM) < 10 || len(serverCertPEM) < 10 || len(serverPrivKeyPEM) < 10
+		if generate {
 			// generate self-signed CA certificate
 			fmt.Printf("generating and saving certificates to %s ... ", certDir)
 			caCertPEM, serverCertPEM, serverPrivKeyPEM, err = util.GenerateCertificate(service, namespace, certDir)
