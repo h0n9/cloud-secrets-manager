@@ -25,16 +25,24 @@ func DecodeBase64(input string) (string, error) {
 	return string(output), nil
 }
 
-func ReadFileToStr(filename string) (string, error) {
+func ReadFileToBytes(filename string) ([]byte, error) {
 	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func ReadFileToStr(filename string) (string, error) {
+	data, err := ReadFileToBytes(filename)
 	if err != nil {
 		return "", err
 	}
 	return string(data), nil
 }
 
-func WriteFile(path string, data []byte) error {
-	f, err := os.Create(path)
+func WriteBytesToFile(filename string, data []byte) error {
+	f, err := os.Create(filename)
 	if err != nil {
 		return err
 	}
@@ -44,4 +52,8 @@ func WriteFile(path string, data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func WriteStrToFile(filename string, data string) error {
+	return WriteBytesToFile(filename, []byte(data))
 }

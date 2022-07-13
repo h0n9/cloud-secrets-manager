@@ -18,9 +18,10 @@ var Cmd = &cobra.Command{
 }
 
 var (
-	service   string
-	namespace string
-	certDir   string
+	namespace   string
+	serviceName string
+	secretName  string
+	certDir     string
 )
 
 var generateCmd = &cobra.Command{
@@ -32,8 +33,8 @@ var generateCmd = &cobra.Command{
 		kubeCli := kubernetes.NewForConfigOrDie(config.GetConfigOrDie())
 
 		// get secret for certificates
-		fmt.Printf("getting Secret '%s'... ", service)
-		secret, err := kubeCli.CoreV1().Secrets(namespace).Get(ctx, service, metav1.GetOptions{})
+		fmt.Printf("getting Secret '%s'... ", secretName)
+		secret, err := kubeCli.CoreV1().Secrets(namespace).Get(ctx, secretName, metav1.GetOptions{})
 		if err != nil {
 			fmt.Println("❌")
 			return err
@@ -49,8 +50,8 @@ var generateCmd = &cobra.Command{
 		generate := len(caCertPEM) < 10 || len(serverCertPEM) < 10 || len(serverPrivKeyPEM) < 10
 		if generate {
 			// generate self-signed CA certificate
-			fmt.Printf("generating and saving certificates to %s ... ", certDir)
-			caCertPEM, serverCertPEM, serverPrivKeyPEM, err = util.GenerateCertificate(service, namespace, certDir)
+			fmt.Printf("generating certificates ... ")
+			caCertPEM, serverCertPEM, serverPrivKeyPEM, err = util.GenerateCertificate(secretName, namespace, certDir)
 			if err != nil {
 				fmt.Println("❌")
 				return err
@@ -62,7 +63,7 @@ var generateCmd = &cobra.Command{
 			secret.Data["tls.key"] = serverPrivKeyPEM
 
 			// update secret for certificates
-			fmt.Printf("updating Secret '%s'... ", service)
+			fmt.Printf("updating Secret '%s'... ", secretName)
 			_, err = kubeCli.CoreV1().Secrets(namespace).Update(ctx, secret, metav1.UpdateOptions{})
 			if err != nil {
 				fmt.Println("❌")
@@ -71,8 +72,8 @@ var generateCmd = &cobra.Command{
 			fmt.Println("✅")
 		}
 
-		fmt.Printf("getting MutatingWebhookConfiguration ... ")
-		mutatingWebhookConfiguration, err := kubeCli.AdmissionregistrationV1().MutatingWebhookConfigurations().Get(ctx, service, metav1.GetOptions{})
+		fmt.Printf("getting MutatingWebhookConfiguration '%s' ... ", serviceName)
+		mutatingWebhookConfiguration, err := kubeCli.AdmissionregistrationV1().MutatingWebhookConfigurations().Get(ctx, serviceName, metav1.GetOptions{})
 		if err != nil {
 			fmt.Println("❌")
 			return err
@@ -84,7 +85,7 @@ var generateCmd = &cobra.Command{
 			mutatingWebhookConfiguration.Webhooks[i].ClientConfig.CABundle = caCertPEM
 		}
 
-		fmt.Printf("updating MutatingWebhookConfiguration ... ")
+		fmt.Printf("updating MutatingWebhookConfiguration '%s' ... ", serviceName)
 		_, err = kubeCli.AdmissionregistrationV1().MutatingWebhookConfigurations().Update(ctx, mutatingWebhookConfiguration, metav1.UpdateOptions{})
 		if err != nil {
 			fmt.Println("❌")
@@ -98,16 +99,22 @@ var generateCmd = &cobra.Command{
 
 func init() {
 	generateCmd.Flags().StringVar(
-		&service,
-		"service",
-		"cloud-secrets-controller",
-		"kubernetes service resource's name",
-	)
-	generateCmd.Flags().StringVar(
 		&namespace,
 		"namespace",
 		"cloud-secrets-controller",
 		"kubernetes service resource's namespace",
+	)
+	generateCmd.Flags().StringVar(
+		&serviceName,
+		"service-name",
+		"cloud-secrets-controller",
+		"kubernetes service resource's name",
+	)
+	generateCmd.Flags().StringVar(
+		&secretName,
+		"secret-name",
+		"cloud-secrets-controller-tls",
+		"kubernetes secret resource's name",
 	)
 	generateCmd.Flags().StringVar(
 		&certDir,
