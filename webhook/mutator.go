@@ -62,6 +62,7 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 
 	// inject sidecar
 	pod.Spec.InitContainers = append(pod.Spec.InitContainers, corev1.Container{
+		Name:  "cloud-secrets-injector",
 		Image: mutator.InjectorImage,
 		Env: []corev1.EnvVar{
 			{Name: "PROVIDER_NAME", Value: providerStr},
