@@ -51,7 +51,7 @@ var generateCmd = &cobra.Command{
 		if generate {
 			// generate self-signed CA certificate
 			fmt.Printf("generating certificates ... ")
-			caCertPEM, serverCertPEM, serverPrivKeyPEM, err = util.GenerateCertificate(secretName, namespace, certDir)
+			caCertPEM, serverCertPEM, serverPrivKeyPEM, err = util.GenerateCertificate(serviceName, namespace, certDir)
 			if err != nil {
 				fmt.Println("❌")
 				return err
@@ -81,7 +81,7 @@ var generateCmd = &cobra.Command{
 		fmt.Println("✅")
 
 		// mutate CABundle
-		for i, _ := range mutatingWebhookConfiguration.Webhooks {
+		for i := range mutatingWebhookConfiguration.Webhooks {
 			mutatingWebhookConfiguration.Webhooks[i].ClientConfig.CABundle = caCertPEM
 		}
 
