@@ -80,8 +80,8 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 	})
 
 	// mount volume to every containers
-	for _, container := range pod.Spec.Containers {
-		container.VolumeMounts = append(container.VolumeMounts, corev1.VolumeMount{
+	for i := range pod.Spec.Containers {
+		pod.Spec.Containers[i].VolumeMounts = append(pod.Spec.Containers[i].VolumeMounts, corev1.VolumeMount{
 			Name:      volumeName,
 			MountPath: filepath.Dir(output),
 		})
