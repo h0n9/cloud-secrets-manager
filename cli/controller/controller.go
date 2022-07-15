@@ -12,7 +12,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	csiWebhook "github.com/h0n9/toybox/cloud-secrets-manager/webhook"
+	csm "github.com/h0n9/toybox/cloud-secrets-manager"
+	csmWebhook "github.com/h0n9/toybox/cloud-secrets-manager/webhook"
 )
 
 var Cmd = &cobra.Command{
@@ -58,11 +59,11 @@ var runCmd = &cobra.Command{
 		logger.Info("added healthz, readyz probes")
 
 		hookServer := mgr.GetWebhookServer()
-		hookServer.Register("/mutate", &webhook.Admission{Handler: &csiWebhook.Mutator{
+		hookServer.Register("/mutate", &webhook.Admission{Handler: &csmWebhook.Mutator{
 			Client:        mgr.GetClient(),
 			InjectorImage: injectorImage,
 		}})
-		hookServer.Register("/validate", &webhook.Admission{Handler: &csiWebhook.Validator{
+		hookServer.Register("/validate", &webhook.Admission{Handler: &csmWebhook.Validator{
 			Client: mgr.GetClient(),
 		}})
 
@@ -103,7 +104,7 @@ func init() {
 	runCmd.Flags().StringVar(
 		&injectorImage,
 		"image",
-		"ghcr.io/h0n9/cloud-secrets-manager:v0.0.4",
+		"ghcr.io/h0n9/cloud-secrets-manager:"+csm.Version,
 		"docker image name with tag for init container",
 	)
 	Cmd.AddCommand(runCmd)

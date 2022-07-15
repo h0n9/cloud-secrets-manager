@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	csm "github.com/h0n9/toybox/cloud-secrets-manager"
 	"github.com/h0n9/toybox/cloud-secrets-manager/cli/cert"
 	"github.com/h0n9/toybox/cloud-secrets-manager/cli/controller"
 	"github.com/h0n9/toybox/cloud-secrets-manager/cli/injector"
@@ -12,8 +13,8 @@ import (
 )
 
 var RootCmd = &cobra.Command{
-	Use:   Name,
-	Short: fmt.Sprintf("'%s' is a tool for playing with cloud-based secrets", Name),
+	Use:   csm.Name,
+	Short: fmt.Sprintf("'%s' is a tool for playing with cloud-based secrets", csm.Name),
 }
 
 func init() {
