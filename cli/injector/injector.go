@@ -26,6 +26,13 @@ var Cmd = &cobra.Command{
 	Short: "cloud-based secrets injector",
 }
 
+var (
+	providerName   string
+	secretID       string
+	templateBase64 string
+	output         string
+)
+
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "inject cloud-based secrets into containers",
@@ -39,14 +46,9 @@ var runCmd = &cobra.Command{
 		logger.Info().Msg("initialized context")
 
 		// get envs
-		secretId := util.GetEnv("SECRET_ID", "")
-		if secretId == "" {
-			return fmt.Errorf("failed to read 'SECRET_ID'")
+		if secretID == "" {
+			return fmt.Errorf("failed to read 'secret-id' flag")
 		}
-		providerName := util.GetEnv("PROVIDER_NAME", DefaultProviderName)
-		templateBase64 := util.GetEnv("TEMPLATE_BASE64", DefaultTemplateBase64)
-		templateFile := util.GetEnv("TEMPLATE_FILE", "")
-		outputFile := util.GetEnv("OUTPUT_FILE", DefaultOutputFilename)
 
 		logger.Info().Msg("read environment variables")
 
@@ -54,12 +56,6 @@ var runCmd = &cobra.Command{
 		templateStr, err := util.DecodeBase64(templateBase64)
 		if err != nil {
 			return err
-		}
-		if templateFile != "" {
-			templateStr, err = util.ReadFileToStr(templateFile)
-			if err != nil {
-				return err
-			}
 		}
 		tmpl := template.New("secret-template")
 		tmpl, err = tmpl.Parse(templateStr)
@@ -93,17 +89,41 @@ var runCmd = &cobra.Command{
 
 		logger.Info().Msg("initialized secret handler")
 
-		err = secretHandler.Save(secretId, outputFile)
+		err = secretHandler.Save(secretID, output)
 		if err != nil {
 			return err
 		}
 
-		logger.Info().Msg(fmt.Sprintf("saved secret id '%s' values to '%s'", secretId, outputFile))
+		logger.Info().Msg(fmt.Sprintf("saved secret id '%s' values to '%s'", secretID, output))
 
 		return nil
 	},
 }
 
 func init() {
+	runCmd.Flags().StringVar(
+		&providerName,
+		"provider",
+		"aws",
+		"cloud provider name",
+	)
+	runCmd.Flags().StringVar(
+		&secretID,
+		"secret-id",
+		"",
+		"secret id",
+	)
+	runCmd.Flags().StringVar(
+		&templateBase64,
+		"template",
+		"e3sgcmFuZ2UgJGssICR2IDo9IC4gfX1be3sgJGsgfX1dCnt7ICR2IH19Cgp7eyBlbmQgfX0K",
+		"base64 encoded template string",
+	)
+	runCmd.Flags().StringVar(
+		&output,
+		"output",
+		"secret",
+		"output filename",
+	)
 	Cmd.AddCommand(runCmd)
 }
