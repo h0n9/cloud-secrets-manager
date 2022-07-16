@@ -64,13 +64,14 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 	pod.Spec.InitContainers = append(pod.Spec.InitContainers, corev1.Container{
 		Name:  "cloud-secrets-injector",
 		Image: mutator.InjectorImage,
-		Env: []corev1.EnvVar{
-			{Name: "PROVIDER_NAME", Value: providerStr},
-			{Name: "SECRET_ID", Value: secretID},
-			{Name: "TEMPLATE_BASE64", Value: util.EncodeBase64(tmplStr)},
-			{Name: "OUTPUT_FILE", Value: output},
+		Args: []string{
+			"injector",
+			"run",
+			fmt.Sprintf("--provider=%s", providerStr),
+			fmt.Sprintf("--secret-id=%s", secretID),
+			fmt.Sprintf("--template=%s", util.EncodeBase64(tmplStr)),
+			fmt.Sprintf("--output=%s", output),
 		},
-		Args: []string{"injector", "run"},
 		VolumeMounts: []corev1.VolumeMount{
 			{
 				Name:      volumeName,
