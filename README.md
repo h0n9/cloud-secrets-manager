@@ -52,18 +52,55 @@ helm upgrade --install -n cloud-secrets-controller cloud-secrets-controller helm
 (The official Helm chart repository should be ready very soon 🙌. Be the first
 to get notified of its launch by pressing the `⭐️ Star` button above.)
 
-## Environment Variables
+## Usage
 
-### Common
+### Annotations
 
-| **Name**          | **Default**                                                                | **Required** |
-|-------------------|----------------------------------------------------------------------------|--------------|
-| `PROVIDER_NAME`   | `aws`                                                                      | false        |
-| `TEMPLATE_BASE64` | `e3sgcmFuZ2UgJGssICR2IDo9IC4gfX1be3sgJGsgfX1dCnt7ICR2IH19Cgp7eyBlbmQgfX0K` | false        |
-| `TEMPLATE_FILE`   |                                                                            | false        |
-| `OUTPUT_FILE`     | `output`                                                                   | false        |
+The following annotatins are required to inject `cloud-secrets-injector` into
+pods:
 
-### AWS
+| **Key**                                            | **Required** |
+|----------------------------------------------------|--------------|
+| `cloud-secrets-manager.h0n9.postie.chat/provider`  | true         |
+| `cloud-secrets-manager.h0n9.postie.chat/secret-id` | true         |
+| `cloud-secrets-manager.h0n9.postie.chat/template`  | true         |
+| `cloud-secrets-manager.h0n9.postie.chat/output`    | true         |
+| `cloud-secrets-manager.h0n9.postie.chat/injected`  | false        |
+
+Please refer the following example:
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox
+  namespace: testbed
+spec:
+  selector:
+    matchLabels:
+      app: busybox
+  template:
+    metadata:
+      labels:
+        app: busybox
+      annotations:
+        cloud-secrets-manager.h0n9.postie.chat/provider: aws
+        cloud-secrets-manager.h0n9.postie.chat/secret-id: dev/test
+        cloud-secrets-manager.h0n9.postie.chat/template: |
+          {{ range $k, $v := . }}export {{ $k }}={{ $v }}
+          {{ end }}
+        cloud-secrets-manager.h0n9.postie.chat/output: /secrets/env
+    spec:
+      containers:
+      - name: busybox
+        image: busybox:1.34.1
+        command:
+          - sleep
+          - "3600"
+```
+
+### Environment variables
+
+#### AWS
 
 | **Name**                | **Default** | **Required** |
 |-------------------------|-------------|--------------|
@@ -74,9 +111,3 @@ to get notified of its launch by pressing the `⭐️ Star` button above.)
 Please don't forget to pass credentials, referring to [Specifying
 Credentials](https://aws.github.io/aws-sdk-go-v2/docs/configuring-sdk/#specifying-credentials)
 page.
-
-## Usage
-
-### Controller
-
-### Injector
