@@ -5,8 +5,15 @@ the way to inject secrets strored on Cloud-based secrets managers into
 Kubernetes Pods, functioning as [HashiCorp Vault's Agent Sidecar
 Injector](https://www.vaultproject.io/docs/platform/k8s/injector).
 
-## Supported Cloud Providers
-- AWS(Amazon Web Services): Secrets Manager
+## Cloud Providers
+
+### Currently Supported
+- AWS(Amazon Web Services): [Secrets Manager](https://aws.amazon.com/secrets-manager/)
+
+### TO-BE Supported
+- Hashicorp: [Vault](https://www.vaultproject.io)
+- GCP(Google Cloud Platform): [Secret Manager](https://cloud.google.com/secret-manager)
+- Azure: [Key Vault](https://azure.microsoft.com/services/key-vault/#getting-started)
 
 ## Installation
 
