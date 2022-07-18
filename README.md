@@ -8,6 +8,22 @@ Injector](https://www.vaultproject.io/docs/platform/k8s/injector).
 ## Supported Cloud Providers
 - AWS(Amazon Web Services): Secrets Manager
 
+## Installation
+
+### Prerequisites
+- Kubernetes Cluster
+- `kubectl`
+- `helm`
+
+### Using Helm chart
+```bash
+kubectl create namespaces cloud-secrets-controller
+helm upgrade --install -n cloud-secrets-controller cloud-secrets-controller helm/
+```
+
+(The official Helm chart repository should be ready very soon 🙌. Be the first
+to get notified of its launch by pressing the `⭐️ Star` button above.)
+
 ## Environment Variables
 
 ### Common
