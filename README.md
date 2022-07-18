@@ -1,4 +1,4 @@
-# Cloud Secrets Manager
+# Cloud Secrets Manager 🌤🔐🐳
 
 This simple yet powerful tool named **Cloud Secrets Manager** aims to simplify
 the way to inject secrets strored on Cloud-based secrets managers into
