@@ -49,8 +49,10 @@ kubectl create namespaces cloud-secrets-controller
 helm upgrade --install -n cloud-secrets-controller cloud-secrets-controller helm/
 ```
 
-(The official Helm chart repository should be ready very soon 🙌. Be the first
-to get notified of its launch by pressing the `⭐️ Star` button above.)
+The official Helm chart repository should be ready very soon 🙌.
+
+By pressing the `⭐️ Star` button above, be the first to get notified of its
+launch.
 
 ## Usage
 
@@ -104,7 +106,6 @@ spec:
 
 | **Name**                | **Default** | **Required** |
 |-------------------------|-------------|--------------|
-| `SECRET_ID`             |             | true         |
 | `AWS_ACCESS_KEY_ID`     |             | false        |
 | `AWS_SECRET_ACCESS_KEY` |             | false        |
 
