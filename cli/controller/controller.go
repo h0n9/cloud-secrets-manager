@@ -80,13 +80,13 @@ func init() {
 	runCmd.Flags().StringVar(
 		&service,
 		"service",
-		"cloud-secrets-controller",
+		"cloud-secrets-manager",
 		"kubernetes service resource's name",
 	)
 	runCmd.Flags().StringVar(
 		&namespace,
 		"namespace",
-		"cloud-secrets-controller",
+		"cloud-secrets-manager",
 		"kubernetes service resource's namespace",
 	)
 	runCmd.Flags().IntVar(

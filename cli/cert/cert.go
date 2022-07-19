@@ -101,19 +101,19 @@ func init() {
 	generateCmd.Flags().StringVar(
 		&namespace,
 		"namespace",
-		"cloud-secrets-controller",
+		"cloud-secrets-manager",
 		"kubernetes service resource's namespace",
 	)
 	generateCmd.Flags().StringVar(
 		&serviceName,
 		"service-name",
-		"cloud-secrets-controller",
+		"cloud-secrets-manager",
 		"kubernetes service resource's name",
 	)
 	generateCmd.Flags().StringVar(
 		&secretName,
 		"secret-name",
-		"cloud-secrets-controller-tls",
+		"cloud-secrets-manager-tls",
 		"kubernetes secret resource's name",
 	)
 	generateCmd.Flags().StringVar(
