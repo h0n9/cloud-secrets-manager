@@ -45,8 +45,9 @@ container starts running as defined on the manifest.
 
 ### Using Helm chart
 ```bash
-kubectl create namespaces cloud-secrets-controller
-helm upgrade --install -n cloud-secrets-controller cloud-secrets-controller helm/
+kubectl create namespaces cloud-secrets-manager
+helm repo add h0n9 https://h0n9.github.io/helm-charts
+helm upgrade --install -n cloud-secrets-manager cloud-secrets-manager h0n9/cloud-secrets-manager
 ```
 
 The official Helm chart repository should be ready very soon 🙌.
