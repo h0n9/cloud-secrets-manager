@@ -2,5 +2,5 @@ package manager
 
 const (
 	Name    = "cloud-secrets-manager"
-	Version = "v0.0.7"
+	Version = "v0.0.8"
 )
