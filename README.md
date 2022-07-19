@@ -50,10 +50,11 @@ helm repo add h0n9 https://h0n9.github.io/helm-charts
 helm upgrade --install -n cloud-secrets-manager cloud-secrets-manager h0n9/cloud-secrets-manager
 ```
 
-The official Helm chart repository should be ready very soon 🙌.
+You can check out the official Helm chart repository
+[h0n9/helm-charts](https://github.com/h0n9/helm-charts).
 
-By pressing the `⭐️ Star` button above, be the first to get notified of its
-launch.
+By pressing the `⭐️ Star` button above, be the first to get notified of launch
+of other new charts.
 
 ## Usage
 
