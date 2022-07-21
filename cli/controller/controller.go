@@ -22,8 +22,8 @@ var Cmd = &cobra.Command{
 }
 
 var (
-	service       string
 	namespace     string
+	service       string
 	port          int
 	certDir       string
 	injectorImage string
@@ -78,16 +78,16 @@ var runCmd = &cobra.Command{
 
 func init() {
 	runCmd.Flags().StringVar(
-		&service,
-		"service",
-		"cloud-secrets-manager",
-		"kubernetes service resource's name",
-	)
-	runCmd.Flags().StringVar(
 		&namespace,
 		"namespace",
 		"cloud-secrets-manager",
 		"kubernetes service resource's namespace",
+	)
+	runCmd.Flags().StringVar(
+		&service,
+		"service",
+		"cloud-secrets-manager",
+		"kubernetes service resource's name",
 	)
 	runCmd.Flags().IntVar(
 		&port,
