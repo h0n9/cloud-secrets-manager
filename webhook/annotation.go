@@ -4,13 +4,11 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	csm "github.com/h0n9/toybox/cloud-secrets-manager"
 )
 
 type Annotations map[string]string
-
-const (
-	AnnotationPrefix = "cloud-secrets-manager.h0n9.postie.chat"
-)
 
 var annotationsAvailable = map[string]bool{
 	"provider":  true,
@@ -23,7 +21,7 @@ var annotationsAvailable = map[string]bool{
 func ParseAndCheckAnnotations(input Annotations) Annotations {
 	output := map[string]string{}
 	for key, value := range input {
-		subPath := strings.TrimPrefix(key, AnnotationPrefix+"/")
+		subPath := strings.TrimPrefix(key, csm.AnnotationPrefix+"/")
 		if subPath == key {
 			continue
 		}
@@ -50,7 +48,7 @@ func (a Annotations) IsInected() bool {
 func (a Annotations) getValue(key string) (string, error) {
 	value, exist := a[key]
 	if !exist {
-		return "", fmt.Errorf("failed to read '%s/%s", AnnotationPrefix, key)
+		return "", fmt.Errorf("failed to read '%s/%s", csm.AnnotationPrefix, key)
 	}
 	return value, nil
 }

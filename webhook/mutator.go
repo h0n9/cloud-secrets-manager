@@ -7,10 +7,12 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/h0n9/toybox/cloud-secrets-manager/util"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+
+	csm "github.com/h0n9/toybox/cloud-secrets-manager"
+	"github.com/h0n9/toybox/cloud-secrets-manager/util"
 )
 
 type Mutator struct {
@@ -89,7 +91,7 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 	}
 
 	// set annotation for injection to true
-	pod.Annotations[fmt.Sprintf("%s/%s", AnnotationPrefix, "injected")] = "true"
+	pod.Annotations[fmt.Sprintf("%s/%s", csm.AnnotationPrefix, "injected")] = "true"
 
 	// marshal pod struct into bytes slice
 	data, err := json.Marshal(pod)
