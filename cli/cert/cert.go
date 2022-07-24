@@ -24,7 +24,6 @@ var Cmd = &cobra.Command{
 var (
 	namespace string
 	service   string
-	secret    string
 	certDir   string
 )
 
@@ -120,12 +119,6 @@ func init() {
 		"service",
 		"cloud-secrets-manager",
 		"kubernetes service resource's name",
-	)
-	generateCmd.Flags().StringVar(
-		&secret,
-		"secret",
-		"cloud-secrets-manager-tls",
-		"kubernetes secret resource's name",
 	)
 	generateCmd.Flags().StringVar(
 		&certDir,
