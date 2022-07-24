@@ -3,12 +3,16 @@ package cert
 import (
 	"context"
 	"fmt"
+	"path"
 
 	"github.com/spf13/cobra"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	admissionregistrationv1 "k8s.io/client-go/applyconfigurations/admissionregistration/v1"
+	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 
+	csm "github.com/h0n9/toybox/cloud-secrets-manager"
 	"github.com/h0n9/toybox/cloud-secrets-manager/util"
 )
 
@@ -32,39 +36,24 @@ var generateCmd = &cobra.Command{
 		ctx := context.Background()
 		kubeCli := kubernetes.NewForConfigOrDie(config.GetConfigOrDie())
 
-		// get secret for certificates
-		fmt.Printf("getting Secret '%s'... ", secret)
-		kubeSecret, err := kubeCli.CoreV1().Secrets(namespace).Get(ctx, secret, metav1.GetOptions{})
+		// generate self-signed CA certificate
+		fmt.Printf("generating certificates ... ")
+		caCert, serverCert, serverPrivKey, err := util.GenerateCertificate(service, namespace)
 		if err != nil {
 			fmt.Println("❌")
 			return err
 		}
 		fmt.Println("✅")
 
-		var (
-			caCertPEM        []byte = kubeSecret.Data["ca.crt"]
-			serverCertPEM    []byte = kubeSecret.Data["tls.crt"]
-			serverPrivKeyPEM []byte = kubeSecret.Data["tls.key"]
-		)
-
-		generate := len(caCertPEM) < 10 || len(serverCertPEM) < 10 || len(serverPrivKeyPEM) < 10
-		if generate {
-			// generate self-signed CA certificate
-			fmt.Printf("generating certificates ... ")
-			caCertPEM, serverCertPEM, serverPrivKeyPEM, err = util.GenerateCertificate(service, namespace, certDir)
-			if err != nil {
-				fmt.Println("❌")
-				return err
-			}
-			fmt.Println("✅")
-
-			kubeSecret.Data["ca.crt"] = caCertPEM
-			kubeSecret.Data["tls.crt"] = serverCertPEM
-			kubeSecret.Data["tls.key"] = serverPrivKeyPEM
-
-			// update secret for certificates
-			fmt.Printf("updating Secret '%s'... ", secret)
-			_, err = kubeCli.CoreV1().Secrets(namespace).Update(ctx, kubeSecret, metav1.UpdateOptions{})
+		// write certificates to files
+		for filename, data := range map[string][]byte{
+			"ca.crt":  caCert,
+			"tls.crt": serverCert,
+			"tls.key": serverPrivKey,
+		} {
+			filename = path.Join(certDir, filename)
+			fmt.Printf("writing to '%s' ... ", filename)
+			err = util.WriteBytesToFile(filename, data)
 			if err != nil {
 				fmt.Println("❌")
 				return err
@@ -72,21 +61,43 @@ var generateCmd = &cobra.Command{
 			fmt.Println("✅")
 		}
 
-		fmt.Printf("getting MutatingWebhookConfiguration '%s' ... ", service)
-		mutatingWebhookConfiguration, err := kubeCli.AdmissionregistrationV1().MutatingWebhookConfigurations().Get(ctx, service, metav1.GetOptions{})
-		if err != nil {
-			fmt.Println("❌")
-			return err
-		}
-		fmt.Println("✅")
-
-		// mutate CABundle
-		for i := range mutatingWebhookConfiguration.Webhooks {
-			mutatingWebhookConfiguration.Webhooks[i].ClientConfig.CABundle = caCertPEM
-		}
-
-		fmt.Printf("updating MutatingWebhookConfiguration '%s' ... ", service)
-		_, err = kubeCli.AdmissionregistrationV1().MutatingWebhookConfigurations().Update(ctx, mutatingWebhookConfiguration, metav1.UpdateOptions{})
+		fmt.Printf("applying MutatingWebhookConfiguration '%s'... ", service)
+		_, err = kubeCli.AdmissionregistrationV1().
+			MutatingWebhookConfigurations().
+			Apply(ctx, admissionregistrationv1.
+				MutatingWebhookConfiguration(service).
+				WithWebhooks(
+					admissionregistrationv1.MutatingWebhook().
+						WithName(csm.AnnotationPrefix).
+						WithClientConfig(admissionregistrationv1.WebhookClientConfig().
+							WithCABundle(caCert...).
+							WithService(admissionregistrationv1.ServiceReference().
+								WithNamespace(namespace).
+								WithName(service).
+								WithPath("/mutate").
+								WithPort(8443),
+							),
+						).
+						WithSideEffects("None").
+						WithAdmissionReviewVersions("v1beta1").
+						WithFailurePolicy("Fail").
+						WithRules(admissionregistrationv1.RuleWithOperations().
+							WithAPIGroups("").
+							WithAPIVersions("v1").
+							WithOperations("CREATE", "UPDATE").
+							WithResources("pods").
+							WithScope("Namespaced"),
+						).
+						WithNamespaceSelector(metav1.LabelSelector().
+							WithMatchLabels(map[string]string{
+								"cloud-secrets-injector": "enabled",
+							}),
+						),
+				),
+				apimetav1.ApplyOptions{
+					FieldManager: csm.Name,
+				},
+			)
 		if err != nil {
 			fmt.Println("❌")
 			return err
