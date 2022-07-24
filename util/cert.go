@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func GenerateCertificate(service, namespace, certDir string) ([]byte, []byte, []byte, error) {
+func GenerateCertificate(service, namespace string) ([]byte, []byte, []byte, error) {
 	now := time.Now()
 	org := []string{
 		"postie.chat",
