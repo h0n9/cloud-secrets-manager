@@ -15,7 +15,7 @@ Injector](https://www.vaultproject.io/docs/platform/k8s/injector).
 - GCP(Google Cloud Platform): [Secret Manager](https://cloud.google.com/secret-manager)
 - Azure: [Key Vault](https://azure.microsoft.com/services/key-vault/#getting-started)
 
-## How it works ?
+## Concept
 
 ### Constitution
 - `cloud-secrets-controller`
