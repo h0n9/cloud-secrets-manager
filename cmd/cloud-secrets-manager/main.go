@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/h0n9/toybox/cloud-secrets-manager/cli"
+	"github.com/h0n9/cloud-secrets-manager/cli"
 )
 
 func main() {

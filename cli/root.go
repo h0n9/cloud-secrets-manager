@@ -5,11 +5,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	csm "github.com/h0n9/toybox/cloud-secrets-manager"
-	"github.com/h0n9/toybox/cloud-secrets-manager/cli/cert"
-	"github.com/h0n9/toybox/cloud-secrets-manager/cli/controller"
-	"github.com/h0n9/toybox/cloud-secrets-manager/cli/injector"
-	cliTemplate "github.com/h0n9/toybox/cloud-secrets-manager/cli/template"
+	csm "github.com/h0n9/cloud-secrets-manager"
+	"github.com/h0n9/cloud-secrets-manager/cli/cert"
+	"github.com/h0n9/cloud-secrets-manager/cli/controller"
+	"github.com/h0n9/cloud-secrets-manager/cli/injector"
+	cliTemplate "github.com/h0n9/cloud-secrets-manager/cli/template"
 )
 
 var RootCmd = &cobra.Command{

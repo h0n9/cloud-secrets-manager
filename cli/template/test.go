@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/h0n9/toybox/cloud-secrets-manager/util"
+	"github.com/h0n9/cloud-secrets-manager/util"
 )
 
 var testCmd = &cobra.Command{

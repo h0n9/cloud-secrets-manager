@@ -5,7 +5,7 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/h0n9/toybox/cloud-secrets-manager/provider"
+	"github.com/h0n9/cloud-secrets-manager/provider"
 )
 
 type SecretHandlerFunc func(string) (string, error)

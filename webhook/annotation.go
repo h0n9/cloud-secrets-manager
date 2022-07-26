@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	csm "github.com/h0n9/toybox/cloud-secrets-manager"
+	csm "github.com/h0n9/cloud-secrets-manager"
 )
 
 type Annotations map[string]string

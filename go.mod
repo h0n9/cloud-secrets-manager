@@ -1,4 +1,4 @@
-module github.com/h0n9/toybox/cloud-secrets-manager
+module github.com/h0n9/cloud-secrets-manager
 
 go 1.18
 

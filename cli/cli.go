@@ -3,7 +3,7 @@ package cli
 import (
 	"fmt"
 
-	csm "github.com/h0n9/toybox/cloud-secrets-manager"
+	csm "github.com/h0n9/cloud-secrets-manager"
 	"github.com/spf13/cobra"
 )
 

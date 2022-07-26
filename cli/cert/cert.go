@@ -12,8 +12,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 
-	csm "github.com/h0n9/toybox/cloud-secrets-manager"
-	"github.com/h0n9/toybox/cloud-secrets-manager/util"
+	csm "github.com/h0n9/cloud-secrets-manager"
+	"github.com/h0n9/cloud-secrets-manager/util"
 )
 
 var Cmd = &cobra.Command{
