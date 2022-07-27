@@ -1,8 +1,8 @@
 # Cloud Secrets Manager 🌤🔐🐳
 
-This simple yet powerful tool named **Cloud Secrets Manager** aims to simplify
-the way to inject secrets strored on Cloud-based secrets managers into
-Kubernetes Pods, functioning as [HashiCorp Vault's Agent Sidecar
+This simple yet powerful tool **Cloud Secrets Manager** aims to simplify the way
+to inject secrets strored on Cloud-based secrets managers into Kubernetes Pods,
+functioning as [HashiCorp Vault's Agent Sidecar
 Injector](https://www.vaultproject.io/docs/platform/k8s/injector).
 
 ## Cloud Providers
@@ -11,9 +11,9 @@ Injector](https://www.vaultproject.io/docs/platform/k8s/injector).
 - AWS(Amazon Web Services): [Secrets Manager](https://aws.amazon.com/secrets-manager/)
 
 ### TO-BE Supported
-- Hashicorp: [Vault](https://www.vaultproject.io)
 - GCP(Google Cloud Platform): [Secret Manager](https://cloud.google.com/secret-manager)
 - Azure: [Key Vault](https://azure.microsoft.com/services/key-vault/#getting-started)
+- Hashicorp: [Vault](https://www.vaultproject.io)
 
 ## Concept
 
@@ -30,9 +30,9 @@ from Kubernetes API server.
 3. `cloud-secrets-controller` mutates the pod's manifests by injecting an init
 container `cloud-secrets-injector` into the pod and mounting a temporary
 directory as a volume on the init and origin containers.
-4. When it comes to initializing the pods, the `cloud-secrets-injector` init
-container requests secret values with a secret key id from secret providers and
-stores them in the temporary directory.
+4. When it comes to initializing the pods, the init container
+`cloud-secrets-injector` requests secret values, with a secret key id, from
+secret providers and stores them in the temporary directory.
 5. Once `cloud-secrets-injector` has successfully completed its role, the origin
 container starts running as defined on the manifest.
 
@@ -98,8 +98,9 @@ spec:
       - name: busybox
         image: busybox:1.34.1
         command:
-          - sleep
-          - "3600"
+          - /bin/sh
+          - -c
+          - cat /secrets/env && sleep 3600
 ```
 
 ### Environment variables
