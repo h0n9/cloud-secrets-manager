@@ -116,7 +116,6 @@ Apply the deployment manifest:
 kubectl apply -f sample-deployment.yaml -n testbed
 ```
 
-
 ### Environment variables
 
 #### AWS
