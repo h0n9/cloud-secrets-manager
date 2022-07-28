@@ -71,7 +71,9 @@ pods:
 | `cloud-secrets-manager.h0n9.postie.chat/output`    | true         |
 | `cloud-secrets-manager.h0n9.postie.chat/injected`  | false        |
 
-Please refer the following example:
+### Example
+
+Please refer the following `sample-deployment.yaml`:
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -102,6 +104,18 @@ spec:
           - -c
           - cat /secrets/env && sleep 3600
 ```
+
+Set label `cloud-secrets-injector=enabled` on namespace `testbed`:
+```bash
+kubectl create namespaces testbed
+kubectl label namespaces testbed cloud-secrets-injector=enabled
+```
+
+Apply the deployment manifest:
+```bash
+kubectl apply -f sample-deployment.yaml -n testbed
+```
+
 
 ### Environment variables
 
