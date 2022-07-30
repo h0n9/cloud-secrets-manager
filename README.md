@@ -9,9 +9,9 @@ Injector](https://www.vaultproject.io/docs/platform/k8s/injector).
 
 ### Currently Supported
 - AWS(Amazon Web Services): [Secrets Manager](https://aws.amazon.com/secrets-manager/)
+- GCP(Google Cloud Platform): [Secret Manager](https://cloud.google.com/secret-manager) `(BETA)`
 
 ### TO-BE Supported
-- GCP(Google Cloud Platform): [Secret Manager](https://cloud.google.com/secret-manager)
 - Azure: [Key Vault](https://azure.microsoft.com/services/key-vault/#getting-started)
 - Hashicorp: [Vault](https://www.vaultproject.io)
 
