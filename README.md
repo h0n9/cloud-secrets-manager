@@ -63,68 +63,19 @@ of other new charts.
 The following annotatins are required to inject `cloud-secrets-injector` into
 pods:
 
-| **Key**                                            | **Required** |
-|----------------------------------------------------|--------------|
-| `cloud-secrets-manager.h0n9.postie.chat/provider`  | true         |
-| `cloud-secrets-manager.h0n9.postie.chat/secret-id` | true         |
-| `cloud-secrets-manager.h0n9.postie.chat/template`  | true         |
-| `cloud-secrets-manager.h0n9.postie.chat/output`    | true         |
-| `cloud-secrets-manager.h0n9.postie.chat/injected`  | false        |
+| **Key**                                            | **Required** | **Description**           | **Example**                                              |
+|----------------------------------------------------|--------------|---------------------------|----------------------------------------------------------|
+| `cloud-secrets-manager.h0n9.postie.chat/provider`  | true         | Cloud Provider Name       | `aws`                                                    |
+| `cloud-secrets-manager.h0n9.postie.chat/secret-id` | true         | Secret Name               | `very-precious-secret`                                   |
+| `cloud-secrets-manager.h0n9.postie.chat/template`  | true         | Template for secret value | ```{{ range $k, $v := . }}{{ $k }}={{ $v }} {{ end }}``` |
+| `cloud-secrets-manager.h0n9.postie.chat/output`    | true         | File path for output      | `/secrets/env`                                           |
+| `cloud-secrets-manager.h0n9.postie.chat/injected`  | false        | Identifier for injection  | `false`                                                  |
 
-### Example
+### Providers
 
-Please refer the following `sample-deployment.yaml`:
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: busybox
-  namespace: testbed
-spec:
-  selector:
-    matchLabels:
-      app: busybox
-  template:
-    metadata:
-      labels:
-        app: busybox
-      annotations:
-        cloud-secrets-manager.h0n9.postie.chat/provider: aws
-        cloud-secrets-manager.h0n9.postie.chat/secret-id: dev/test
-        cloud-secrets-manager.h0n9.postie.chat/template: |
-          {{ range $k, $v := . }}export {{ $k }}={{ $v }}
-          {{ end }}
-        cloud-secrets-manager.h0n9.postie.chat/output: /secrets/env
-    spec:
-      containers:
-      - name: busybox
-        image: busybox:1.34.1
-        command:
-          - /bin/sh
-          - -c
-          - cat /secrets/env && sleep 3600
-```
+Supported providers require the annotations mentioned above in common. However,
+the authentication method may differ depending on the provider. Please refer the
+following explanation.
 
-Set label `cloud-secrets-injector=enabled` on namespace `testbed`:
-```bash
-kubectl create namespaces testbed
-kubectl label namespaces testbed cloud-secrets-injector=enabled
-```
-
-Apply the deployment manifest:
-```bash
-kubectl apply -f sample-deployment.yaml -n testbed
-```
-
-### Environment variables
-
-#### AWS
-
-| **Name**                | **Default** | **Required** |
-|-------------------------|-------------|--------------|
-| `AWS_ACCESS_KEY_ID`     |             | false        |
-| `AWS_SECRET_ACCESS_KEY` |             | false        |
-
-Please don't forget to pass credentials, referring to [Specifying
-Credentials](https://aws.github.io/aws-sdk-go-v2/docs/configuring-sdk/#specifying-credentials)
-page.
+- [AWS(Amazon Web Services)](docs/aws.md)
+- [GCP(Google Cloud Platform)](docs/gcp.md)
