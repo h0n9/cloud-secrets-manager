@@ -31,11 +31,10 @@ func (provider *AWS) Close() error {
 }
 
 func (provider *AWS) GetSecretValue(secretID string) (string, error) {
-	secret, err := provider.client.GetSecretValue(provider.ctx, &secretsmanager.GetSecretValueInput{
-		SecretId: &secretID,
-	})
+	req := &secretsmanager.GetSecretValueInput{SecretId: &secretID}
+	resp, err := provider.client.GetSecretValue(provider.ctx, req)
 	if err != nil {
 		return "", err
 	}
-	return *secret.SecretString, nil
+	return *resp.SecretString, nil
 }
