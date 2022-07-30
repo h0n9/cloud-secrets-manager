@@ -59,3 +59,61 @@ manifests with kubectl.
 
 It's going to work as it should, just like 🧈.
 
+## Example
+
+Please refer the following `sample-deployment.yaml`:
+```yaml
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: busybox
+  annotations:
+    iam.gke.io/gcp-service-account: testbed-service-account@h0n9.iam.gserviceaccount.com
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox
+spec:
+  selector:
+    matchLabels:
+      app: busybox
+  template:
+    metadata:
+      labels:
+        app: busybox
+      annotations:
+        cloud-secrets-manager.h0n9.postie.chat/provider: gcp
+        cloud-secrets-manager.h0n9.postie.chat/secret-id: projects/h0n9/secrets/testbed-secret/versions/latest
+        cloud-secrets-manager.h0n9.postie.chat/template: |
+          {{ range $k, $v := . }}export {{ $k }}={{ $v }}
+          {{ end }}
+        cloud-secrets-manager.h0n9.postie.chat/output: /secrets/env
+    spec:
+      serviceAccountName: busybox
+      nodeSelector:
+        iam.gke.io/gke-metadata-server-enabled: "true"
+      containers:
+      - name: busybox
+        image: busybox:1.34.1
+        command:
+          - /bin/sh
+          - -c
+          - cat /secrets/env && sleep 3600
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "100m"
+```
+
+Set label `cloud-secrets-injector=enabled` on namespace `testbed`:
+```bash
+kubectl create namespaces testbed
+kubectl label namespaces testbed cloud-secrets-injector=enabled
+```
+
+Apply the deployment manifest:
+```bash
+kubectl apply -f sample-deployment.yaml -n testbed
+```
