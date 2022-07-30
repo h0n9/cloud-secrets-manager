@@ -79,6 +79,7 @@ var runCmd = &cobra.Command{
 		default:
 			return fmt.Errorf("failed to figure out secret provider")
 		}
+		defer secretProvider.Close()
 
 		logger.Info().Msg(fmt.Sprintf("initialized secret provider '%s'", providerName))
 
