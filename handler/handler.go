@@ -19,8 +19,8 @@ func NewSecretHandler(provider provider.SecretProvider, tmpl *template.Template)
 	return &SecretHandler{provider: provider, template: tmpl}, nil
 }
 
-func (handler *SecretHandler) Get(secretId string) (map[string]interface{}, error) {
-	secretValue, err := handler.provider.GetSecretValue(secretId)
+func (handler *SecretHandler) Get(secretID string) (map[string]interface{}, error) {
+	secretValue, err := handler.provider.GetSecretValue(secretID)
 	if err != nil {
 		return nil, err
 	}
@@ -34,8 +34,8 @@ func (handler *SecretHandler) Get(secretId string) (map[string]interface{}, erro
 	return m, nil
 }
 
-func (handler *SecretHandler) Save(secretId, path string) error {
-	m, err := handler.Get(secretId)
+func (handler *SecretHandler) Save(secretID, path string) error {
+	m, err := handler.Get(secretID)
 	if err != nil {
 		return err
 	}

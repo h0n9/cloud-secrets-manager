@@ -73,12 +73,15 @@ var runCmd = &cobra.Command{
 		switch strings.ToLower(providerName) {
 		case "aws":
 			secretProvider, err = provider.NewAWS(ctx)
-			if err != nil {
-				return err
-			}
+		case "gcp":
+			secretProvider, err = provider.NewGCP(ctx)
 		default:
 			return fmt.Errorf("failed to figure out secret provider")
 		}
+		if err != nil {
+			return err
+		}
+		defer secretProvider.Close()
 
 		logger.Info().Msg(fmt.Sprintf("initialized secret provider '%s'", providerName))
 

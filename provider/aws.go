@@ -26,12 +26,15 @@ func NewAWS(ctx context.Context) (*AWS, error) {
 	}, nil
 }
 
-func (provider *AWS) GetSecretValue(secretId string) (string, error) {
-	secret, err := provider.client.GetSecretValue(provider.ctx, &secretsmanager.GetSecretValueInput{
-		SecretId: &secretId,
-	})
+func (provider *AWS) Close() error {
+	return nil
+}
+
+func (provider *AWS) GetSecretValue(secretID string) (string, error) {
+	req := &secretsmanager.GetSecretValueInput{SecretId: &secretID}
+	resp, err := provider.client.GetSecretValue(provider.ctx, req)
 	if err != nil {
 		return "", err
 	}
-	return *secret.SecretString, nil
+	return *resp.SecretString, nil
 }

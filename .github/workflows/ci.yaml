@@ -2,10 +2,13 @@ name: ci
 on:
   push:
     branches:
+      - main
       - develop
       - feature/*
     tags:
       - v*
+    paths-ignore:
+      - ".github/**"
 env:
   img-registry: ghcr.io/h0n9
   img-repository: cloud-secrets-manager
