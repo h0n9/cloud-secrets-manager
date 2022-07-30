@@ -63,13 +63,13 @@ of other new charts.
 The following annotatins are required to inject `cloud-secrets-injector` into
 pods:
 
-| **Key**                                            | **Required** |
-|----------------------------------------------------|--------------|
-| `cloud-secrets-manager.h0n9.postie.chat/provider`  | true         |
-| `cloud-secrets-manager.h0n9.postie.chat/secret-id` | true         |
-| `cloud-secrets-manager.h0n9.postie.chat/template`  | true         |
-| `cloud-secrets-manager.h0n9.postie.chat/output`    | true         |
-| `cloud-secrets-manager.h0n9.postie.chat/injected`  | false        |
+| **Key**                                            | **Required** | **Description**           | **Example**                                              |
+|----------------------------------------------------|--------------|---------------------------|----------------------------------------------------------|
+| `cloud-secrets-manager.h0n9.postie.chat/provider`  | true         | Cloud Provider Name       | `aws`                                                    |
+| `cloud-secrets-manager.h0n9.postie.chat/secret-id` | true         | Secret Name               | `very-precious-secret`                                   |
+| `cloud-secrets-manager.h0n9.postie.chat/template`  | true         | Template for secret value | ```{{ range $k, $v := . }}{{ $k }}={{ $v }} {{ end }}``` |
+| `cloud-secrets-manager.h0n9.postie.chat/output`    | true         | File path for output      | `/secrets/env`                                           |
+| `cloud-secrets-manager.h0n9.postie.chat/injected`  | false        | Identifier for injection  | `false`                                                  |
 
 ### Example
 
