@@ -61,7 +61,7 @@ server. It's simple but secure.
             ]
         }
         ```
-3. Associate an IAM role
+3. Associate the IAM role to a Kubernetes service account
     ```yaml
     apiVersion: v1
     kind: ServiceAccount

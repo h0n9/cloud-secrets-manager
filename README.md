@@ -78,6 +78,7 @@ the authentication method may differ depending on the provider. Please refer the
 following explanation.
 
 - [AWS(Amazon Web Services)](docs/aws.md)
+- [GCP(Google Cloud Platform)](docs/gcp.md)
 
 ### Example
 
