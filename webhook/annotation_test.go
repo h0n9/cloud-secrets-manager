@@ -21,31 +21,31 @@ func TestParseAndCheckAnnotations(t *testing.T) {
 	assert.Error(t, err)
 	assert.EqualValues(t, Annotations{}, parsed)
 	parsed, err = ParseAndCheckAnnotations(Annotations{
-		"cloud-secrets-manager.h0n9.postie.chat/secret": "my-precious-secret", // ❌ secret 💔 output
-		"cloud-secrets-manager.h0n9.postie.chat/output": "envs",               // ❌ secret 💔 output
+		"cloud-secrets-manager.h0n9.postie.chat/secret": "my-precious-secret", // ❌: secret 💔 output
+		"cloud-secrets-manager.h0n9.postie.chat/output": "envs",               // ❌: secret 💔 output
 	})
 	assert.Error(t, err)
 	assert.EqualValues(t, Annotations{}, parsed)
 	parsed, err = ParseAndCheckAnnotations(Annotations{
-		"cloud-secrets-manager.h0n9.postie.chat/secret":   "my-precious-secret", // ❌ secret 💔 template
-		"cloud-secrets-manager.h0n9.postie.chat/template": SampleTemplate,       // ❌ secret 💔 template
+		"cloud-secrets-manager.h0n9.postie.chat/secret":   "my-precious-secret", // ❌: secret 💔 template
+		"cloud-secrets-manager.h0n9.postie.chat/template": SampleTemplate,       // ❌: secret 💔 template
 	})
 	assert.Error(t, err)
 	assert.EqualValues(t, Annotations{}, parsed)
 
 	// ignore cases
 	parsed, err = ParseAndCheckAnnotations(Annotations{
-		"vault.hashicorp.com/secret-volume-path-SECRET-NAME-foobar": "/envs", // ❌: non related annotation
+		"vault.hashicorp.com/secret-volume-path-SECRET-NAME-foobar": "/envs", // 🤔: non related annotation
 	})
 	assert.NoError(t, err)
 	assert.EqualValues(t, Annotations{}, parsed)
 	parsed, err = ParseAndCheckAnnotations(Annotations{
-		"cloud-secrets-manager.h0n9.postie.chat": "h0n9", // ❌: non subpath
+		"cloud-secrets-manager.h0n9.postie.chat": "h0n9", // 🤔: non subpath
 	})
 	assert.NoError(t, err)
 	assert.EqualValues(t, Annotations{}, parsed)
 	parsed, err = ParseAndCheckAnnotations(Annotations{
-		"cloud-secrets-manager.h0n9.posite.chat/template": SampleTemplate, // ❌: typo
+		"cloud-secrets-manager.h0n9.posite.chat/template": SampleTemplate, // 🤔: typo
 	})
 	assert.NoError(t, err)
 	assert.EqualValues(t, Annotations{}, parsed)
