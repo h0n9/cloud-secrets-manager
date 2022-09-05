@@ -15,22 +15,32 @@ var annotationsAvailable = map[string]bool{
 	"secret-id": true,
 	"template":  true,
 	"output":    true,
+	"secret":    true,
 	"injected":  true,
 }
 
-func ParseAndCheckAnnotations(input Annotations) Annotations {
-	output := map[string]string{}
-	for key, value := range input {
+func ParseAndCheckAnnotations(origin Annotations) (Annotations, error) {
+	parsed := Annotations{}
+	for key, value := range origin {
 		subPath := strings.TrimPrefix(key, csm.AnnotationPrefix+"/")
 		if subPath == key {
 			continue
 		}
 		if _, exist := annotationsAvailable[subPath]; !exist {
-			continue
+			return Annotations{}, fmt.Errorf("found invalid annotations")
 		}
-		output[subPath] = value
+		parsed[subPath] = value
 	}
-	return output
+
+	// check unsupported annotation combination
+	_, secretExist := parsed["secret"]
+	_, outputExist := parsed["output"]
+	_, templateExist := parsed["template"]
+	if secretExist && (outputExist || templateExist) {
+		return Annotations{}, fmt.Errorf("found invalid annotation combination")
+	}
+
+	return parsed, nil
 }
 
 func (a Annotations) IsInected() bool {
@@ -67,4 +77,8 @@ func (a Annotations) GetTemplate() (string, error) {
 
 func (a Annotations) GetOutput() (string, error) {
 	return a.getValue("output")
+}
+
+func (a Annotations) GetSecret() (string, error) {
+	return a.getValue("secret")
 }

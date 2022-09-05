@@ -29,7 +29,10 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
-	annotations := ParseAndCheckAnnotations(pod.GetAnnotations())
+	annotations, err := ParseAndCheckAnnotations(pod.GetAnnotations())
+	if err != nil {
+		return admission.Errored(http.StatusBadRequest, err)
+	}
 	if len(annotations) == 0 {
 		return admission.Allowed("found no annotations related to cloud-secrets-injector")
 	}
