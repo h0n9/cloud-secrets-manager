@@ -45,11 +45,11 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 	if err != nil {
 		return admission.Errored(http.StatusBadRequest, err)
 	}
-	providerStr, err := annotations.GetProvider()
+	provider, err := annotations.GetProvider()
 	if err != nil {
 		return admission.Errored(http.StatusBadRequest, err)
 	}
-	tmplStr, err := annotations.GetTemplate()
+	tmpl, err := annotations.GetTemplate()
 	if err != nil {
 		return admission.Errored(http.StatusBadRequest, err)
 	}
@@ -58,6 +58,29 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
+	err = injectAsFile(pod, mutator.InjectorImage, provider, secretID, tmpl, output)
+	if err != nil {
+		return admission.Errored(http.StatusInternalServerError, err)
+	}
+
+	// set annotation for injection to true
+	pod.Annotations[fmt.Sprintf("%s/%s", csm.AnnotationPrefix, "injected")] = "true"
+
+	// marshal pod struct into bytes slice
+	data, err := json.Marshal(pod)
+	if err != nil {
+		return admission.Errored(http.StatusInternalServerError, err)
+	}
+
+	return admission.PatchResponseFromRaw(req.Object.Raw, data)
+}
+
+func (mutator *Mutator) InjectDecoder(decoder *admission.Decoder) error {
+	mutator.decoder = decoder
+	return nil
+}
+
+func injectAsFile(pod *corev1.Pod, injectorImage, provider, secretID, tmpl, output string) error {
 	// append 'cloud-secrets-injector' volume to pod volumes
 	volumeName := "cloud-secrets-injector"
 	pod.Spec.Volumes = append(pod.Spec.Volumes, corev1.Volume{
@@ -68,13 +91,13 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 	// inject sidecar
 	pod.Spec.InitContainers = append(pod.Spec.InitContainers, corev1.Container{
 		Name:  "cloud-secrets-injector",
-		Image: mutator.InjectorImage,
+		Image: injectorImage,
 		Args: []string{
 			"injector",
 			"run",
-			fmt.Sprintf("--provider=%s", providerStr),
+			fmt.Sprintf("--provider=%s", provider),
 			fmt.Sprintf("--secret-id=%s", secretID),
-			fmt.Sprintf("--template=%s", util.EncodeBase64(tmplStr)),
+			fmt.Sprintf("--template=%s", util.EncodeBase64(tmpl)),
 			fmt.Sprintf("--output=%s", output),
 		},
 		VolumeMounts: []corev1.VolumeMount{
@@ -93,19 +116,9 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 		})
 	}
 
-	// set annotation for injection to true
-	pod.Annotations[fmt.Sprintf("%s/%s", csm.AnnotationPrefix, "injected")] = "true"
-
-	// marshal pod struct into bytes slice
-	data, err := json.Marshal(pod)
-	if err != nil {
-		return admission.Errored(http.StatusInternalServerError, err)
-	}
-
-	return admission.PatchResponseFromRaw(req.Object.Raw, data)
+	return nil
 }
 
-func (mutator *Mutator) InjectDecoder(decoder *admission.Decoder) error {
-	mutator.decoder = decoder
+func injectAsSecret(pod *corev1.Pod, name string) error {
 	return nil
 }
