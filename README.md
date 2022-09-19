@@ -25,7 +25,7 @@ Injector](https://www.vaultproject.io/docs/platform/k8s/injector).
 1. `cloud-secrets-controller` watches incoming `/mutate`, `/validate` webhooks
 from Kubernetes API server.
 2. When pods are created or updated in a namespace labeled with
-`cloud-secrets-injector: true`, Kubernetes API server sends requests to
+`cloud-secrets-injector: enabled`, Kubernetes API server sends requests to
 `cloud-secrets-controller` webhook server.
 3. `cloud-secrets-controller` mutates the pod's manifests by injecting an init
 container `cloud-secrets-injector` into the pod and mounting a temporary
