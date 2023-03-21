@@ -31,6 +31,7 @@ func ParseAnnotationSet(input map[string]string) AnnotationSet {
 			if subPath == key {
 				continue
 			}
+			subPath = strings.TrimPrefix(subPath, "-")
 			if _, exist = output[subPath]; !exist {
 				output[subPath] = Annotations{}
 			}
