@@ -36,6 +36,43 @@ func TestParseAndCheckAnnotations(t *testing.T) {
 	assert.EqualValues(t, expectedOutput, output)
 }
 
+func TestParseAnnotationSet(t *testing.T) {
+	input := map[string]string{
+		"cloud-secrets-manager.h0n9.postie.chat/provider":           "aws",               // ✅
+		"cloud-secrets-manager.h0n9.postie.chat/secret-id":          "life-is-beautiful", // ✅
+		"cloud-secrets-manager.h0n9.postie.chat/output":             "/envs",             // ✅
+		"cloud-secrets-manager.h0n9.postie.chat/template":           SampleTemplate,      // ✅
+		"cloud-secrets-manager.h0n9.postie.chat/injected":           "true",              // ✅
+		"cloud-secrets-manager.h0n9.posite.chat/template":           SampleTemplate,      // ❌: typo
+		"cloud-secrets-manager.h0n9.postie.chat/volume-path":        "/envs",             // ❌: unsupported
+		"cloud-secrets-manager.h0n9.postie.chat":                    "h0n9",              // ❌: non subpath
+		"vault.hashicorp.com/secret-volume-path-SECRET-NAME-foobar": "/envs",             // ❌: non related annotation
+		"cloud-secrets-manager.h0n9.postie.chat/provider-test":      "gcp",               // ✅
+		"cloud-secrets-manager.h0n9.postie.chat/secret-id-test":     "life-is-wonderful", // ✅
+		"cloud-secrets-manager.h0n9.postie.chat/output-test":        "/secrets/envs",     // ✅
+		"cloud-secrets-manager.h0n9.postie.chat/template-test":      SampleTemplate,      // ✅
+		"cloud-secrets-manager.h0n9.postie.chat/injected-test":      "false",             // ✅
+	}
+	output := ParseAnnotationSet(input)
+	expectedOutput := AnnotationSet{
+		"": Annotations{
+			"provider":  "aws",
+			"secret-id": "life-is-beautiful",
+			"template":  SampleTemplate,
+			"output":    "/envs",
+			"injected":  "true",
+		},
+		"test": Annotations{
+			"provider":  "gcp",
+			"secret-id": "life-is-wonderful",
+			"template":  SampleTemplate,
+			"output":    "/secrets/envs",
+			"injected":  "false",
+		},
+	}
+	assert.EqualValues(t, expectedOutput, output)
+}
+
 func TestAnnotationsIsInjected(t *testing.T) {
 	annotations := Annotations{}
 	assert.False(t, annotations.IsInected())
