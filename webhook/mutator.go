@@ -36,7 +36,8 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 
 	for secretName, annotations := range annotationSet {
 		if annotations.IsInected() {
-			return admission.Allowed("do nothing as secrets are already injected")
+			// return admission.Allowed("do nothing as secrets are already injected")
+			continue
 		}
 
 		secretID, err := annotations.GetSecretID()
