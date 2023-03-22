@@ -84,7 +84,7 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 			VolumeMounts: []corev1.VolumeMount{
 				{
 					Name:      injectorName,
-					MountPath: filepath.Dir(output),
+					MountPath: csm.InjectorVolumeMountPath,
 				},
 			},
 		})
