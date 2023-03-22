@@ -93,7 +93,7 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 		for i := range pod.Spec.Containers {
 			pod.Spec.Containers[i].VolumeMounts = append(pod.Spec.Containers[i].VolumeMounts, corev1.VolumeMount{
 				Name:      injectorName,
-				MountPath: filepath.Dir(output),
+				MountPath: output,
 				SubPath:   filepath.Base(output),
 			})
 		}
