@@ -79,7 +79,7 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 				fmt.Sprintf("--provider=%s", providerStr),
 				fmt.Sprintf("--secret-id=%s", secretID),
 				fmt.Sprintf("--template=%s", util.EncodeBase64(tmplStr)),
-				fmt.Sprintf("--output=%s", output),
+				fmt.Sprintf("--output=%s", filepath.Join(csm.InjectorVolumeMountPath, filepath.Base(output))),
 			},
 			VolumeMounts: []corev1.VolumeMount{
 				{
