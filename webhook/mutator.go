@@ -96,10 +96,14 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 				SubPath:   filepath.Base(output),
 			})
 		}
-	}
 
-	// set annotation for injection to true
-	pod.Annotations[fmt.Sprintf("%s/%s", csm.AnnotationPrefix, "injected")] = "true"
+		// set annotation for injection to true
+		injected := "injected"
+		if secretName != "" {
+			injected = injected + "-" + secretName
+		}
+		pod.Annotations[fmt.Sprintf("%s/%s", csm.AnnotationPrefix, injected)] = "true"
+	}
 
 	// marshal pod struct into bytes slice
 	data, err := json.Marshal(pod)
