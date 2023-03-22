@@ -56,12 +56,13 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 			return admission.Errored(http.StatusBadRequest, err)
 		}
 
+		// prepare injector name for general use
 		injectorName := "cloud-secrets-injector"
 		if secretName != "" {
 			injectorName = injectorName + "-" + secretName
 		}
 
-		// append 'cloud-secrets-injector' volume to pod volumes
+		// append volume to pod volumes
 		pod.Spec.Volumes = append(pod.Spec.Volumes, corev1.Volume{
 			Name:         injectorName,
 			VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
@@ -92,6 +93,7 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 			pod.Spec.Containers[i].VolumeMounts = append(pod.Spec.Containers[i].VolumeMounts, corev1.VolumeMount{
 				Name:      injectorName,
 				MountPath: filepath.Dir(output),
+				SubPath:   filepath.Base(output),
 			})
 		}
 	}
