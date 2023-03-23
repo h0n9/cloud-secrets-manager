@@ -8,14 +8,56 @@ import (
 	csm "github.com/h0n9/cloud-secrets-manager"
 )
 
+const (
+	AnnotationProvider = "provider"
+	AnnotationSecretID = "secret-id"
+	AnnotationTemplate = "template"
+	AnnotationOutput   = "output"
+	AnnotationInjected = "injected"
+)
+
+type AnnotationSet map[string]Annotations
+
+var AnnotationMap = map[string]string{
+	fmt.Sprintf("%s/%s", csm.AnnotationPrefix, AnnotationProvider): AnnotationProvider,
+	fmt.Sprintf("%s/%s", csm.AnnotationPrefix, AnnotationSecretID): AnnotationSecretID,
+	fmt.Sprintf("%s/%s", csm.AnnotationPrefix, AnnotationTemplate): AnnotationTemplate,
+	fmt.Sprintf("%s/%s", csm.AnnotationPrefix, AnnotationOutput):   AnnotationOutput,
+	fmt.Sprintf("%s/%s", csm.AnnotationPrefix, AnnotationInjected): AnnotationInjected,
+}
+
+func ParseAnnotationSet(input map[string]string) AnnotationSet {
+	var (
+		output               = AnnotationSet{}
+		exist                bool
+		subPath, full, short string
+	)
+	// TODO: enhance O(5N)
+	for key, value := range input {
+		for full, short = range AnnotationMap {
+			subPath = strings.TrimPrefix(key, full)
+			if subPath == key {
+				continue
+			}
+			subPath = strings.TrimPrefix(subPath, "-")
+			if _, exist = output[subPath]; !exist {
+				output[subPath] = Annotations{}
+			}
+			output[subPath][short] = value
+			break
+		}
+	}
+	return output
+}
+
 type Annotations map[string]string
 
 var annotationsAvailable = map[string]bool{
-	"provider":  true,
-	"secret-id": true,
-	"template":  true,
-	"output":    true,
-	"injected":  true,
+	AnnotationProvider: true,
+	AnnotationSecretID: true,
+	AnnotationTemplate: true,
+	AnnotationOutput:   true,
+	AnnotationInjected: true,
 }
 
 func ParseAndCheckAnnotations(input Annotations) Annotations {
@@ -34,7 +76,7 @@ func ParseAndCheckAnnotations(input Annotations) Annotations {
 }
 
 func (a Annotations) IsInected() bool {
-	value, exist := a["injected"]
+	value, exist := a[AnnotationInjected]
 	if !exist {
 		return false
 	}
@@ -54,17 +96,17 @@ func (a Annotations) getValue(key string) (string, error) {
 }
 
 func (a Annotations) GetProvider() (string, error) {
-	return a.getValue("provider")
+	return a.getValue(AnnotationProvider)
 }
 
 func (a Annotations) GetSecretID() (string, error) {
-	return a.getValue("secret-id")
+	return a.getValue(AnnotationSecretID)
 }
 
 func (a Annotations) GetTemplate() (string, error) {
-	return a.getValue("template")
+	return a.getValue(AnnotationTemplate)
 }
 
 func (a Annotations) GetOutput() (string, error) {
-	return a.getValue("output")
+	return a.getValue(AnnotationOutput)
 }
