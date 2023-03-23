@@ -73,7 +73,7 @@ pods:
 
 #### Annotations for Multiple Secrets Injection
 
-From the version `vX.X`, multiple secrets can be injected into pods by defining
+From the version `v0.4`, multiple secrets can be injected into pods by defining
 the annotations as follows:
 
 ```yaml
