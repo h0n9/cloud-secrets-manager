@@ -71,6 +71,33 @@ pods:
 | `cloud-secrets-manager.h0n9.postie.chat/output`    | true         | File path for output      | `/secrets/env`                                           |
 | `cloud-secrets-manager.h0n9.postie.chat/injected`  | false        | Identifier for injection  | `false`                                                  |
 
+#### Annotations for Multiple Secrets Injection
+
+From the version `vX.X`, multiple secrets can be injected into pods by defining
+the annotations as follows:
+
+```yaml
+cloud-secrets-manager.h0n9.postie.chat/provider: aws
+cloud-secrets-manager.h0n9.postie.chat/secret-id: secrets-env
+cloud-secrets-manager.h0n9.postie.chat/output: /secrets/env
+cloud-secrets-manager.h0n9.postie.chat/template: |
+  {{ range $k, $v := . }}export {{ $k }}={{ $v }}
+  {{ end }}
+cloud-secrets-manager.h0n9.postie.chat/provider-config-app: aws
+cloud-secrets-manager.h0n9.postie.chat/secret-id-config-app: secrets-config
+cloud-secrets-manager.h0n9.postie.chat/output-config-app: /config/application.yaml
+cloud-secrets-manager.h0n9.postie.chat/template-config-app: |
+  {{ .application-yaml }}
+cloud-secrets-manager.h0n9.postie.chat/provider-config-secrets: aws
+cloud-secrets-manager.h0n9.postie.chat/secret-id-config-secrets: secrets-config
+cloud-secrets-manager.h0n9.postie.chat/output-config-secrets: /config/secrets.yaml
+cloud-secrets-manager.h0n9.postie.chat/template-config-secrets: |
+  {{ .secrets-yaml }}
+```
+
+Just add `<secret-name>` at the end of each annotation key, like
+`cloud-secrets-manager.h0n9.postie.chat/provider-<secret-name>`. That's it!
+
 ### Providers
 
 Supported providers require the annotations mentioned above in common. However,
