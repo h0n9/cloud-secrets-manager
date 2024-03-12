@@ -23,9 +23,9 @@ func init() {
 	RootCmd.AddCommand(
 		controller.Cmd,
 		injector.Cmd,
+		cert.Cmd,
 		newLineCmd,
 		cliTemplate.Cmd,
-		cert.Cmd,
 		newLineCmd,
 		VersionCmd,
 	)
