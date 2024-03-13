@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 )
@@ -31,7 +32,7 @@ func (provider *AWS) Close() error {
 }
 
 func (provider *AWS) GetSecretValue(secretID string) (string, error) {
-	req := &secretsmanager.GetSecretValueInput{SecretId: &secretID}
+	req := &secretsmanager.GetSecretValueInput{SecretId: aws.String(secretID)}
 	resp, err := provider.client.GetSecretValue(provider.ctx, req)
 	if err != nil {
 		return "", err
