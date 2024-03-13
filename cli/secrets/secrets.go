@@ -90,7 +90,24 @@ var editCmd = &cobra.Command{
 			return err
 		}
 
-		// TODO: update secret value
+		// read tmp file
+		data, err = os.ReadFile(tmpFilePath)
+		if err != nil {
+			return err
+		}
+
+		// unmarsal data to mm
+		mm := map[string]interface{}{}
+		err = yaml.Unmarshal(data, &mm)
+		if err != nil {
+			return err
+		}
+
+		// marshal mm to json
+		data, err = json.Marshal(mm)
+		if err != nil {
+			return err
+		}
 
 		// TODO: set secret value to provider
 
