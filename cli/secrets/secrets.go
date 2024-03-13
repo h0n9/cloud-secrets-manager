@@ -3,6 +3,7 @@ package secrets
 import (
 	"context"
 	"crypto/sha1"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -10,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 
 	"github.com/h0n9/cloud-secrets-manager/provider"
 	"github.com/h0n9/cloud-secrets-manager/util"
@@ -68,14 +70,27 @@ var editCmd = &cobra.Command{
 			return err
 		}
 
-		// write secret value to tmp file
+		// unmarshal secret value to struct
+		m := map[string]interface{}{}
+		err = json.Unmarshal([]byte(secretValue), &m)
+		if err != nil {
+			return err
+		}
+
+		// marshal m to yaml
+		data, err := yaml.Marshal(m)
+		if err != nil {
+			return err
+		}
+
+		// write data to tmp file
 		UserCacheDir, err := os.UserCacheDir()
 		if err != nil {
 			return err
 		}
 		hash := sha1.Sum([]byte(secretID))
 		tmpFilePath := path.Join(UserCacheDir, fmt.Sprintf("%x", hash))
-		err = os.WriteFile(tmpFilePath, []byte(secretValue), 0644)
+		err = os.WriteFile(tmpFilePath, data, 0644)
 		if err != nil {
 			return err
 		}
