@@ -9,6 +9,7 @@ import (
 	"github.com/h0n9/cloud-secrets-manager/cli/cert"
 	"github.com/h0n9/cloud-secrets-manager/cli/controller"
 	"github.com/h0n9/cloud-secrets-manager/cli/injector"
+	cliSecrets "github.com/h0n9/cloud-secrets-manager/cli/secrets"
 	cliTemplate "github.com/h0n9/cloud-secrets-manager/cli/template"
 )
 
@@ -25,6 +26,7 @@ func init() {
 		injector.Cmd,
 		cert.Cmd,
 		newLineCmd,
+		cliSecrets.Cmd,
 		cliTemplate.Cmd,
 		newLineCmd,
 		VersionCmd,
