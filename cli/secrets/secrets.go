@@ -81,7 +81,7 @@ var editCmd = &cobra.Command{
 		}
 
 		// open tmp file with editor(e.g. vim)
-		editor := util.GetEnv("EDITOR", "vim")
+		editor := util.GetEnv("EDITOR", DefaultEditor)
 		execCmd := exec.Command(editor, tmpFilePath)
 		execCmd.Stdin = os.Stdin
 		execCmd.Stdout = os.Stdout
