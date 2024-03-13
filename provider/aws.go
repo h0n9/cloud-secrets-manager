@@ -40,5 +40,13 @@ func (provider *AWS) GetSecretValue(secretID string) (string, error) {
 }
 
 func (provider *AWS) SetSecretValue(secretID, secretValue string) error {
+	req := &secretsmanager.PutSecretValueInput{
+		SecretId:     aws.String(secretID),
+		SecretString: aws.String(secretValue),
+	}
+	_, err := provider.client.PutSecretValue(provider.ctx, req)
+	if err != nil {
+		return err
+	}
 	return nil
 }
