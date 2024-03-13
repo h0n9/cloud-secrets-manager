@@ -112,7 +112,11 @@ var editCmd = &cobra.Command{
 		// update secret value
 		secretValue = string(data)
 
-		// TODO: set secret value to provider
+		// set secret value to provider
+		err = secretProvider.SetSecretValue(secretID, secretValue)
+		if err != nil {
+			return err
+		}
 
 		// remove tmp file
 		err = os.Remove(tmpFilePath)
