@@ -38,3 +38,7 @@ func (provider *GCP) GetSecretValue(secretID string) (string, error) {
 	}
 	return string(resp.GetPayload().GetData()), nil
 }
+
+func (provider *GCP) SetSecretValue(secretID string) error {
+	return nil
+}
