@@ -109,6 +109,9 @@ var editCmd = &cobra.Command{
 			return err
 		}
 
+		// update secret value
+		secretValue = string(data)
+
 		// TODO: set secret value to provider
 
 		// remove tmp file
