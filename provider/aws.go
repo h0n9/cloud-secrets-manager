@@ -39,6 +39,6 @@ func (provider *AWS) GetSecretValue(secretID string) (string, error) {
 	return *resp.SecretString, nil
 }
 
-func (provider *AWS) SetSecretValue(secretID string) error {
+func (provider *AWS) SetSecretValue(secretID, secretValue string) error {
 	return nil
 }
