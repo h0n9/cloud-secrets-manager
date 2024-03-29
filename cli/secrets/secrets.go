@@ -3,7 +3,6 @@ package secrets
 import (
 	"context"
 	"crypto/sha1"
-	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -11,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
+	"sigs.k8s.io/yaml"
 
 	"github.com/h0n9/cloud-secrets-manager/provider"
 	"github.com/h0n9/cloud-secrets-manager/util"
@@ -70,15 +69,8 @@ var editCmd = &cobra.Command{
 			return err
 		}
 
-		// unmarshal secret value to struct
-		m := map[string]interface{}{}
-		err = json.Unmarshal([]byte(secretValue), &m)
-		if err != nil {
-			return err
-		}
-
-		// marshal m to yaml
-		data, err := yaml.Marshal(m)
+		// convert json to yaml
+		data, err := yaml.JSONToYAML([]byte(secretValue))
 		if err != nil {
 			return err
 		}
@@ -111,15 +103,8 @@ var editCmd = &cobra.Command{
 			return err
 		}
 
-		// unmarsal data to mm
-		mm := map[string]interface{}{}
-		err = yaml.Unmarshal(data, &mm)
-		if err != nil {
-			return err
-		}
-
-		// marshal mm to json
-		data, err = json.Marshal(mm)
+		// convert yaml to json
+		data, err = yaml.YAMLToJSON(data)
 		if err != nil {
 			return err
 		}
