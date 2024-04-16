@@ -87,6 +87,12 @@ var editCmd = &cobra.Command{
 			return err
 		}
 
+		// get initial stat of tmp file
+		initialStat, err := os.Stat(tmpFilePath)
+		if err != nil {
+			return err
+		}
+
 		// open tmp file with editor(e.g. vim)
 		editor := util.GetEnv("EDITOR", DefaultEditor)
 		execCmd := exec.Command(editor, tmpFilePath)
@@ -95,6 +101,19 @@ var editCmd = &cobra.Command{
 		err = execCmd.Run()
 		if err != nil {
 			return err
+		}
+
+		// get updated stat of tmp file
+		updatedStat, err := os.Stat(tmpFilePath)
+		if err != nil {
+			return err
+		}
+
+		// check if tmp file is updated. if not, return nil
+		if initialStat.ModTime().Equal(updatedStat.ModTime()) &&
+			initialStat.Size() == updatedStat.Size() {
+			fmt.Println("found nothing to update")
+			return nil
 		}
 
 		// read tmp file
