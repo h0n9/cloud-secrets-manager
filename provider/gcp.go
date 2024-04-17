@@ -28,6 +28,20 @@ func (provider *GCP) Close() error {
 	return provider.client.Close()
 }
 
+func (provider *GCP) ListSecrets() ([]string, error) {
+	req := &secretmanagerpb.ListSecretsRequest{}
+	var secrets []string
+	secretsIterator := provider.client.ListSecrets(provider.ctx, req)
+	for {
+		resp, err := secretsIterator.Next()
+		if err != nil {
+			break
+		}
+		secrets = append(secrets, resp.GetName())
+	}
+	return secrets, nil
+}
+
 // The secretID in the format `projects/*/secrets/*/versions/*`.
 // `projects/*/secrets/*/versions/latest`: recently created
 func (provider *GCP) GetSecretValue(secretID string) (string, error) {
