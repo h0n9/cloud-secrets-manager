@@ -33,14 +33,29 @@ func (provider *AWS) Close() error {
 
 func (provider *AWS) ListSecrets() ([]string, error) {
 	req := &secretsmanager.ListSecretsInput{}
-	resp, err := provider.client.ListSecrets(provider.ctx, req)
-	if err != nil {
-		return nil, err
-	}
 	var secrets []string
-	for _, secret := range resp.SecretList {
-		secrets = append(secrets, *secret.Name)
+
+	for {
+		// list secrets
+		resp, err := provider.client.ListSecrets(provider.ctx, req)
+		if err != nil {
+			return nil, err
+		}
+
+		// append secret names
+		for _, secret := range resp.SecretList {
+			secrets = append(secrets, *secret.Name)
+		}
+
+		// break if no more secrets
+		if resp.NextToken == nil {
+			break
+		}
+
+		// set next token
+		req.NextToken = resp.NextToken
 	}
+
 	return secrets, nil
 }
 
