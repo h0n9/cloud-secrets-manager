@@ -31,6 +31,19 @@ func (provider *AWS) Close() error {
 	return nil
 }
 
+func (provider *AWS) ListSecrets() ([]string, error) {
+	req := &secretsmanager.ListSecretsInput{}
+	resp, err := provider.client.ListSecrets(provider.ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	var secrets []string
+	for _, secret := range resp.SecretList {
+		secrets = append(secrets, *secret.Name)
+	}
+	return secrets, nil
+}
+
 func (provider *AWS) GetSecretValue(secretID string) (string, error) {
 	req := &secretsmanager.GetSecretValueInput{SecretId: aws.String(secretID)}
 	resp, err := provider.client.GetSecretValue(provider.ctx, req)
