@@ -17,8 +17,7 @@ import (
 )
 
 var (
-	providerName string
-	secretID     string
+	secretID string
 )
 
 var editCmd = &cobra.Command{
