@@ -31,7 +31,7 @@ func (provider *AWS) Close() error {
 	return nil
 }
 
-func (provider *AWS) ListSecrets() ([]string, error) {
+func (provider *AWS) ListSecrets(limit int) ([]string, error) {
 	req := &secretsmanager.ListSecretsInput{}
 	var secrets []string
 
@@ -47,8 +47,8 @@ func (provider *AWS) ListSecrets() ([]string, error) {
 			secrets = append(secrets, *secret.Name)
 		}
 
-		// break if no more secrets
-		if resp.NextToken == nil {
+		// break if no more secrets or reached the limit
+		if resp.NextToken == nil || len(secrets) >= limit {
 			break
 		}
 
