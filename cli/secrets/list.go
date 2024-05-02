@@ -10,6 +10,14 @@ import (
 	"github.com/h0n9/cloud-secrets-manager/provider"
 )
 
+const (
+	DefaultListSecretsLimit = 100
+)
+
+var (
+	listSecretsLimit int
+)
+
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "list secrets",
@@ -38,7 +46,7 @@ var listCmd = &cobra.Command{
 		defer secretProvider.Close()
 
 		// list secrets
-		secrets, err := secretProvider.ListSecrets()
+		secrets, err := secretProvider.ListSecrets(listSecretsLimit)
 		if err != nil {
 			return err
 		}
@@ -58,5 +66,11 @@ func init() {
 		"provider",
 		DefaultProviderName,
 		"cloud provider name",
+	)
+	listCmd.Flags().IntVar(
+		&listSecretsLimit,
+		"limit",
+		DefaultListSecretsLimit,
+		"limit the number of secrets to list",
 	)
 }
