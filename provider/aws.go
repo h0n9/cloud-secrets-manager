@@ -56,7 +56,7 @@ func (provider *AWS) ListSecrets(limit int) ([]string, error) {
 		req.NextToken = resp.NextToken
 	}
 
-	return secrets, nil
+	return secrets[:limit], nil
 }
 
 func (provider *AWS) GetSecretValue(secretID string) (string, error) {
