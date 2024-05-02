@@ -28,15 +28,23 @@ func (provider *GCP) Close() error {
 	return provider.client.Close()
 }
 
-func (provider *GCP) ListSecrets() ([]string, error) {
+func (provider *GCP) ListSecrets(limit int) ([]string, error) {
 	req := &secretmanagerpb.ListSecretsRequest{}
 	var secrets []string
 	secretsIterator := provider.client.ListSecrets(provider.ctx, req)
 	for {
+		// get next secret
 		resp, err := secretsIterator.Next()
 		if err != nil {
 			break
 		}
+
+		// break if reached the limit
+		if len(secrets) >= limit {
+			break
+		}
+
+		// append secret name
 		secrets = append(secrets, resp.GetName())
 	}
 	return secrets, nil
