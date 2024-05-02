@@ -31,6 +31,7 @@ func (provider *GCP) Close() error {
 func (provider *GCP) ListSecrets(limit int) ([]string, error) {
 	req := &secretmanagerpb.ListSecretsRequest{}
 	var secrets []string
+
 	secretsIterator := provider.client.ListSecrets(provider.ctx, req)
 	for {
 		// get next secret
@@ -39,15 +40,16 @@ func (provider *GCP) ListSecrets(limit int) ([]string, error) {
 			break
 		}
 
+		// append secret name
+		secrets = append(secrets, resp.GetName())
+
 		// break if reached the limit
 		if len(secrets) >= limit {
 			break
 		}
-
-		// append secret name
-		secrets = append(secrets, resp.GetName())
 	}
-	return secrets, nil
+
+	return secrets[:limit], nil
 }
 
 // The secretID in the format `projects/*/secrets/*/versions/*`.
