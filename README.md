@@ -9,9 +9,9 @@ Also, it provides a convenient CLI tool with features like `list` and `edit` to
 make secret management easier than using the Cloud Console.
 
 ## Contents
-- [Cloud Providers](#cloud-providers)
-  - [Currently Supported](#currently-supported)
-  - [TO-BE Supported](#to-be-supported)
+- [Supported Cloud Providers](#cloud-providers)
+  - [Current](#current)
+  - [Planned](#planned)
 - [Concept](#concept)
   - [Constitution](#constitution)
   - [Step-by-step](#step-by-step)
@@ -22,14 +22,13 @@ make secret management easier than using the Cloud Console.
   - [Annotations](#annotations)
   - [Providers](#providers)
 
+## Supported Cloud Providers
 
-## Cloud Providers
-
-### Currently Supported
+### Current
 - AWS(Amazon Web Services): [Secrets Manager](https://aws.amazon.com/secrets-manager/)
 - GCP(Google Cloud Platform): [Secret Manager](https://cloud.google.com/secret-manager) `(BETA)`
 
-### TO-BE Supported
+### Planned
 - Azure: [Key Vault](https://azure.microsoft.com/services/key-vault/#getting-started)
 - Hashicorp: [Vault](https://www.vaultproject.io)
 
