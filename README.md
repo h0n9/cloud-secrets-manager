@@ -5,13 +5,32 @@ to inject secrets strored on Cloud-based secrets managers into Kubernetes Pods,
 functioning as [HashiCorp Vault's Agent Sidecar
 Injector](https://www.vaultproject.io/docs/platform/k8s/injector).
 
-## Cloud Providers
+Also, it provides a convenient CLI tool with features like `list` and `edit` to
+make secret management easier than using the Cloud Console. If you want to jump
+into the CLI tool, please refer to the [CLI Tool](#cli-tool) section right away.
 
-### Currently Supported
+## Contents
+- [Supported Cloud Providers](#cloud-providers)
+  - [Current](#current)
+  - [Planned](#planned)
+- [Concept](#concept)
+  - [Constitution](#constitution)
+  - [Step-by-step](#step-by-step)
+- [Installation](#installation)
+  - [Prerequisites](#prerequisites)
+  - [Using Helm chart](#using-helm-chart)
+- [Usage](#usage)
+  - [Annotations](#annotations)
+  - [Providers](#providers)
+  - [CLI Tool](#cli-tool)
+
+## Supported Cloud Providers
+
+### Current
 - AWS(Amazon Web Services): [Secrets Manager](https://aws.amazon.com/secrets-manager/)
 - GCP(Google Cloud Platform): [Secret Manager](https://cloud.google.com/secret-manager) `(BETA)`
 
-### TO-BE Supported
+### Planned
 - Azure: [Key Vault](https://azure.microsoft.com/services/key-vault/#getting-started)
 - Hashicorp: [Vault](https://www.vaultproject.io)
 
@@ -106,3 +125,47 @@ following explanation.
 
 - [AWS(Amazon Web Services)](docs/aws.md)
 - [GCP(Google Cloud Platform)](docs/gcp.md)
+
+### CLI Tool
+
+#### Installation
+
+As Cloud Secrets Manager is available as a Docker image, there is no need to
+install the CLI tool. Just run the Docker container as follows:
+
+```bash
+$ dokcer pull ghcr.io/h0n9/cloud-secrets-manager:latest
+```
+
+You can change the tag to a specific version if you want like following:
+
+```bash
+$ dokcer pull ghcr.io/h0n9/cloud-secrets-manager:v0.5
+```
+
+#### List Secrets
+
+```bash
+$ docker run --rm -it ghcr.io/h0n9/cloud-secrets-manager:latest secrets list --provider aws --limit 3
+dev/hello-world
+dev/very-precious-secret
+dev/another-secret
+```
+The `--limit` option is available to limit the number of secrets to be listed.
+
+#### Edit Secret
+
+```bash
+$ docker run --rm -it ghcr.io/h0n9/cloud-secrets-manager:latest secrets edit --provider aws --secret-id dev/very-precious-secret
+```
+
+A text editor will be opened with the secret value. After editing, save and
+close the editor to update the secret value. If you want to cancel the editing,
+just close the editor without saving.
+
+If you want to use a specific editor, set the `EDITOR` environment variable.
+
+```bash
+$ export EDITOR=nano
+$ docker run --rm -it ghcr.io/h0n9/cloud-secrets-manager:latest secrets edit --provider aws --secret-id dev/very-precious-secret
+```

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
-	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1"
+	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
 )
 
 type GCP struct {
@@ -28,6 +28,35 @@ func (provider *GCP) Close() error {
 	return provider.client.Close()
 }
 
+func (provider *GCP) ListSecrets(limit int) ([]string, error) {
+	req := &secretmanagerpb.ListSecretsRequest{}
+	var secrets []string
+
+	secretsIterator := provider.client.ListSecrets(provider.ctx, req)
+	for {
+		// get next secret
+		resp, err := secretsIterator.Next()
+		if err != nil {
+			break
+		}
+
+		// append secret name
+		secrets = append(secrets, resp.GetName())
+
+		// break if reached the limit
+		if len(secrets) >= limit {
+			break
+		}
+	}
+
+	// truncate secrets if exceeded the limit
+	if len(secrets) > limit {
+		secrets = secrets[:limit]
+	}
+
+	return secrets, nil
+}
+
 // The secretID in the format `projects/*/secrets/*/versions/*`.
 // `projects/*/secrets/*/versions/latest`: recently created
 func (provider *GCP) GetSecretValue(secretID string) (string, error) {
@@ -37,4 +66,8 @@ func (provider *GCP) GetSecretValue(secretID string) (string, error) {
 		return "", err
 	}
 	return string(resp.GetPayload().GetData()), nil
+}
+
+func (provider *GCP) SetSecretValue(secretID, secretValue string) error {
+	return nil
 }
