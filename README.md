@@ -128,6 +128,15 @@ following explanation.
 
 ### CLI Tool
 
+#### Installation
+
+As Cloud Secrets Manager is available as a Docker image, there is no need to
+install the CLI tool. Just run the Docker container as follows:
+
+```bash
+$ dokcer pull ghcr.io/h0n9/cloud-secrets-manager:latest
+```
+
 #### List Secrets
 
 ```bash
