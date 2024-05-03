@@ -2,5 +2,7 @@ package provider
 
 type SecretProvider interface {
 	Close() error
-	GetSecretValue(string) (string, error)
+	ListSecrets(limit int) ([]string, error)
+	GetSecretValue(secretID string) (string, error)
+	SetSecretValue(secretID string, secretValue string) error
 }
