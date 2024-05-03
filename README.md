@@ -137,6 +137,12 @@ install the CLI tool. Just run the Docker container as follows:
 $ dokcer pull ghcr.io/h0n9/cloud-secrets-manager:latest
 ```
 
+You can change the tag to a specific version if you want like following:
+
+```bash
+$ dokcer pull ghcr.io/h0n9/cloud-secrets-manager:v0.4
+```
+
 #### List Secrets
 
 ```bash
