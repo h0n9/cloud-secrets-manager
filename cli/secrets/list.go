@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	DefaultListSecretsLimit = 100
+	DefaultListSecretsLimit = 10
 )
 
 var (
