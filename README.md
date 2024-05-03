@@ -123,3 +123,32 @@ following explanation.
 
 - [AWS(Amazon Web Services)](docs/aws.md)
 - [GCP(Google Cloud Platform)](docs/gcp.md)
+
+### CLI Tool
+
+#### List Secrets
+
+```bash
+$ cloud-secrets-manager secrets list --provider aws --limit 3
+dev/hello-world
+dev/very-precious-secret
+dev/another-secret
+```
+The `--limit` option is available to limit the number of secrets to be listed.
+
+#### Edit Secret
+
+```bash
+$ cloud-secrets-manager secrets edit --provider aws --secret-id dev/very-precious-secret
+```
+
+A text editor will be opened with the secret value. After editing, save and
+close the editor to update the secret value. If you want to cancel the editing,
+just close the editor without saving.
+
+If you want to use a specific editor, set the `EDITOR` environment variable.
+
+```bash
+$ export EDITOR=nano
+$ cloud-secrets-manager secrets edit --provider aws --secret-id dev/very-precious-secret
+```
