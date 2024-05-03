@@ -6,7 +6,8 @@ functioning as [HashiCorp Vault's Agent Sidecar
 Injector](https://www.vaultproject.io/docs/platform/k8s/injector).
 
 Also, it provides a convenient CLI tool with features like `list` and `edit` to
-make secret management easier than using the Cloud Console.
+make secret management easier than using the Cloud Console. If you want to jump
+into the CLI tool, please refer to the [CLI Tool](#cli-tool) section right away.
 
 ## Contents
 - [Supported Cloud Providers](#cloud-providers)
@@ -21,6 +22,7 @@ make secret management easier than using the Cloud Console.
 - [Usage](#usage)
   - [Annotations](#annotations)
   - [Providers](#providers)
+  - [CLI Tool](#cli-tool)
 
 ## Supported Cloud Providers
 
