@@ -12,6 +12,7 @@ on:
 env:
   img-registry: ghcr.io/h0n9
   img-repository: cloud-secrets-manager
+  img-tags: ghcr.io/h0n9/cloud-secrets-manager:tmp
   img-push: "false"
 jobs:
   build-push:
