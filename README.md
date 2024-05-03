@@ -146,7 +146,7 @@ $ dokcer pull ghcr.io/h0n9/cloud-secrets-manager:v0.4
 #### List Secrets
 
 ```bash
-$ cloud-secrets-manager secrets list --provider aws --limit 3
+$ docker run --rm -it ghcr.io/h0n9/cloud-secrets-manager:latest secrets list --provider aws --limit 3
 dev/hello-world
 dev/very-precious-secret
 dev/another-secret
@@ -156,7 +156,7 @@ The `--limit` option is available to limit the number of secrets to be listed.
 #### Edit Secret
 
 ```bash
-$ cloud-secrets-manager secrets edit --provider aws --secret-id dev/very-precious-secret
+$ docker run --rm -it ghcr.io/h0n9/cloud-secrets-manager:latest secrets edit --provider aws --secret-id dev/very-precious-secret
 ```
 
 A text editor will be opened with the secret value. After editing, save and
@@ -167,5 +167,5 @@ If you want to use a specific editor, set the `EDITOR` environment variable.
 
 ```bash
 $ export EDITOR=nano
-$ cloud-secrets-manager secrets edit --provider aws --secret-id dev/very-precious-secret
+$ docker run --rm -it ghcr.io/h0n9/cloud-secrets-manager:latest secrets edit --provider aws --secret-id dev/very-precious-secret
 ```
