@@ -56,7 +56,12 @@ func (provider *AWS) ListSecrets(limit int) ([]string, error) {
 		req.NextToken = resp.NextToken
 	}
 
-	return secrets[:limit], nil
+	// truncate secrets if exceeded the limit
+	if len(secrets) > limit {
+		secrets = secrets[:limit]
+	}
+
+	return secrets, nil
 }
 
 func (provider *AWS) GetSecretValue(secretID string) (string, error) {

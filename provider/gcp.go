@@ -49,7 +49,12 @@ func (provider *GCP) ListSecrets(limit int) ([]string, error) {
 		}
 	}
 
-	return secrets[:limit], nil
+	// truncate secrets if exceeded the limit
+	if len(secrets) > limit {
+		secrets = secrets[:limit]
+	}
+
+	return secrets, nil
 }
 
 // The secretID in the format `projects/*/secrets/*/versions/*`.
