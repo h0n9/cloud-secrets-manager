@@ -28,6 +28,11 @@ var listCmd = &cobra.Command{
 			secretProvider provider.SecretProvider
 		)
 
+		// check constraints
+		if listSecretsLimit <= 0 {
+			return fmt.Errorf("'--limit' flag value must be greater than 0")
+		}
+
 		// init ctx
 		ctx := context.Background()
 
