@@ -143,6 +143,15 @@ You can change the tag to a specific version if you want like following:
 $ dokcer pull ghcr.io/h0n9/cloud-secrets-manager:v0.5
 ```
 
+> For `aws-vault` users, the following command allows you to run the container
+with the necessary credentials. We acknowledge that the command is a bit
+lengthy, but rest assured, we're actively working on a more streamlined
+solution, including a potential Homebrew release for Cloud Secrets Manager:
+
+```bash
+$ aws-vault exec <profile> -- docker run --rm -it -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN -e AWS_SECURITY_TOKEN ghcr.io/h0n9/cloud-secrets-manager:latest <command>
+```
+
 #### List Secrets
 
 ```bash
