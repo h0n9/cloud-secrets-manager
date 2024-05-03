@@ -5,6 +5,9 @@ to inject secrets strored on Cloud-based secrets managers into Kubernetes Pods,
 functioning as [HashiCorp Vault's Agent Sidecar
 Injector](https://www.vaultproject.io/docs/platform/k8s/injector).
 
+Also, it provides a convenient CLI tool with features like `list` and `edit` to
+make secret management easier than using the Cloud Console.
+
 ## Cloud Providers
 
 ### Currently Supported
