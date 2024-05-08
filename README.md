@@ -136,7 +136,7 @@ Cloud Secrets Manager can be installed via Homebrew:
 $ brew install h0n9/devops/cloud-secrets-manager
 ```
 
-That's it! You can now use the `cloud-secrets-manager`, or `csm` commands.
+That's it! You can now use the `cloud-secrets-manager` or `csm` commands.
 
 > For `aws-vault` users, you can use the following command to execute the
 `cloud-secrets-manager` command with the specified AWS profile:
