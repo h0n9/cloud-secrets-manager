@@ -130,32 +130,25 @@ following explanation.
 
 #### Installation
 
-As Cloud Secrets Manager is available as a Docker image, there is no need to
-install the CLI tool. Just run the Docker container as follows:
+Cloud Secrets Manager can be installed via Homebrew:
 
 ```bash
-$ dokcer pull ghcr.io/h0n9/cloud-secrets-manager:latest
+$ brew install h0n9/devops/cloud-secrets-manager
 ```
 
-You can change the tag to a specific version if you want like following:
+That's it! You can now use the `cloud-secrets-manager` command.
+
+> For `aws-vault` users, you can use the following command to execute the
+`cloud-secrets-manager` command with the specified AWS profile:
 
 ```bash
-$ dokcer pull ghcr.io/h0n9/cloud-secrets-manager:v0.5
-```
-
-> For `aws-vault` users, the following command allows you to run the container
-with the necessary credentials. We acknowledge that the command is a bit
-lengthy, but rest assured, we're actively working on a more streamlined
-solution, including a potential Homebrew release for Cloud Secrets Manager:
-
-```bash
-$ aws-vault exec <profile> -- docker run --rm -it -e AWS_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN -e AWS_SECURITY_TOKEN ghcr.io/h0n9/cloud-secrets-manager:latest <command>
+$ aws-vault exec <profile> -- cloud-secrets-manager <command>
 ```
 
 #### List Secrets
 
 ```bash
-$ docker run --rm -it ghcr.io/h0n9/cloud-secrets-manager:latest secrets list --provider aws --limit 3
+$ cloud-secrets-manager secrets list --provider aws --limit 3
 dev/hello-world
 dev/very-precious-secret
 dev/another-secret
@@ -165,7 +158,7 @@ The `--limit` option is available to limit the number of secrets to be listed.
 #### Edit Secret
 
 ```bash
-$ docker run --rm -it ghcr.io/h0n9/cloud-secrets-manager:latest secrets edit --provider aws --secret-id dev/very-precious-secret
+$ cloud-secrets-manager secrets edit --provider aws --secret-id dev/very-precious-secret
 ```
 
 A text editor will be opened with the secret value. After editing, save and
@@ -176,5 +169,5 @@ If you want to use a specific editor, set the `EDITOR` environment variable.
 
 ```bash
 $ export EDITOR=nano
-$ docker run --rm -it ghcr.io/h0n9/cloud-secrets-manager:latest secrets edit --provider aws --secret-id dev/very-precious-secret
+$ cloud-secrets-manager secrets edit --provider aws --secret-id dev/very-precious-secret
 ```
