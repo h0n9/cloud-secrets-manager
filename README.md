@@ -136,7 +136,7 @@ Cloud Secrets Manager can be installed via Homebrew:
 $ brew install h0n9/devops/cloud-secrets-manager
 ```
 
-That's it! You can now use the `cloud-secrets-manager` command.
+That's it! You can now use the `cloud-secrets-manager`, or `csm` commands.
 
 > For `aws-vault` users, you can use the following command to execute the
 `cloud-secrets-manager` command with the specified AWS profile:
@@ -148,7 +148,7 @@ $ aws-vault exec <profile> -- cloud-secrets-manager <command>
 #### List Secrets
 
 ```bash
-$ cloud-secrets-manager secrets list --provider aws --limit 3
+$ csm secrets list --provider aws --limit 3
 dev/hello-world
 dev/very-precious-secret
 dev/another-secret
@@ -158,7 +158,7 @@ The `--limit` option is available to limit the number of secrets to be listed.
 #### Edit Secret
 
 ```bash
-$ cloud-secrets-manager secrets edit --provider aws --secret-id dev/very-precious-secret
+$ csm secrets edit --provider aws --secret-id dev/very-precious-secret
 ```
 
 A text editor will be opened with the secret value. After editing, save and
@@ -169,5 +169,5 @@ If you want to use a specific editor, set the `EDITOR` environment variable.
 
 ```bash
 $ export EDITOR=nano
-$ cloud-secrets-manager secrets edit --provider aws --secret-id dev/very-precious-secret
+$ csm secrets edit --provider aws --secret-id dev/very-precious-secret
 ```
