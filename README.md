@@ -142,7 +142,7 @@ That's it! You can now use the `cloud-secrets-manager` or `csm` commands.
 `cloud-secrets-manager` command with the specified AWS profile:
 
 ```bash
-$ aws-vault exec <profile> -- cloud-secrets-manager <command>
+$ aws-vault exec <profile> -- csm <command>
 ```
 
 #### List Secrets
