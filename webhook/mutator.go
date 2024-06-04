@@ -69,6 +69,28 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 			VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
 		})
 
+		// prepare mount path for general use
+		mountPath := output
+		subPath := filepath.Base(mountPath)
+
+		// mount volume to every init containers
+		for i := range pod.Spec.InitContainers {
+			pod.Spec.InitContainers[i].VolumeMounts = append(pod.Spec.InitContainers[i].VolumeMounts, corev1.VolumeMount{
+				Name:      injectorName,
+				MountPath: mountPath,
+				SubPath:   subPath,
+			})
+		}
+
+		// mount volume to every containers
+		for i := range pod.Spec.Containers {
+			pod.Spec.Containers[i].VolumeMounts = append(pod.Spec.Containers[i].VolumeMounts, corev1.VolumeMount{
+				Name:      injectorName,
+				MountPath: mountPath,
+				SubPath:   subPath,
+			})
+		}
+
 		// create init container for injection
 		initContainer := corev1.Container{
 			Name:  injectorName,
@@ -79,7 +101,7 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 				fmt.Sprintf("--provider=%s", providerStr),
 				fmt.Sprintf("--secret-id=%s", secretID),
 				fmt.Sprintf("--template=%s", util.EncodeBase64(tmplStr)),
-				fmt.Sprintf("--output=%s", filepath.Join(csm.InjectorVolumeMountPath, filepath.Base(output))),
+				fmt.Sprintf("--output=%s", filepath.Join(csm.InjectorVolumeMountPath, subPath)),
 			},
 			VolumeMounts: []corev1.VolumeMount{
 				{
@@ -91,15 +113,6 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 
 		// append init container to pod's init containers
 		pod.Spec.InitContainers = append([]corev1.Container{initContainer}, pod.Spec.InitContainers...)
-
-		// mount volume to every containers
-		for i := range pod.Spec.Containers {
-			pod.Spec.Containers[i].VolumeMounts = append(pod.Spec.Containers[i].VolumeMounts, corev1.VolumeMount{
-				Name:      injectorName,
-				MountPath: output,
-				SubPath:   filepath.Base(output),
-			})
-		}
 
 		// set annotation for injection to true
 		injected := "injected"
