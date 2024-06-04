@@ -13,7 +13,7 @@ env:
   img-registry: ghcr.io/h0n9
   img-repository: cloud-secrets-manager
   img-tags: ghcr.io/h0n9/cloud-secrets-manager:tmp
-  img-push: "false"
+  img-push: "true"
   img-platforms: linux/amd64
 jobs:
   build-push:
@@ -31,11 +31,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
       - name: "Set env vars (develop)"
-        if: ${{ github.ref_name == 'develop' }}
         shell: bash
         run: |
           echo "img-tags=${{ env.img-registry }}/${{ env.img-repository }}:dev-${GITHUB_SHA::6}" >> $GITHUB_ENV
-          echo "img-push=true" >> $GITHUB_ENV
       - name: "Set env vars (tag)"
         if: ${{ startsWith(github.ref_name, 'v') }}
         shell: bash
