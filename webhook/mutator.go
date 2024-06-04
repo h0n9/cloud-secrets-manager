@@ -69,6 +69,15 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 			VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
 		})
 
+		// mount volume to every init containers
+		for i := range pod.Spec.InitContainers {
+			pod.Spec.InitContainers[i].VolumeMounts = append(pod.Spec.InitContainers[i].VolumeMounts, corev1.VolumeMount{
+				Name:      injectorName,
+				MountPath: output,
+				SubPath:   filepath.Base(output),
+			})
+		}
+
 		// create init container for injection
 		initContainer := corev1.Container{
 			Name:  injectorName,
