@@ -27,10 +27,11 @@ var Cmd = &cobra.Command{
 }
 
 var (
-	providerName   string
-	secretID       string
-	templateBase64 string
-	output         string
+	providerName              string
+	secretID                  string
+	templateBase64            string
+	output                    string
+	decodeBase64EncodedSecret bool
 )
 
 var runCmd = &cobra.Command{
@@ -92,7 +93,7 @@ var runCmd = &cobra.Command{
 
 		logger.Info().Msg("initialized secret handler")
 
-		err = secretHandler.Save(secretID, output)
+		err = secretHandler.Save(secretID, output, decodeBase64EncodedSecret)
 		if err != nil {
 			return err
 		}
@@ -127,6 +128,12 @@ func init() {
 		"output",
 		"secret",
 		"output filename",
+	)
+	runCmd.Flags().BoolVar(
+		&decodeBase64EncodedSecret,
+		"decode-b64-secret",
+		false,
+		"decode base64 encoded secret",
 	)
 	Cmd.AddCommand(runCmd)
 }
