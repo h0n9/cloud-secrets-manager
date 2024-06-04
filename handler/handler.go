@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"os"
 	"text/template"
 
@@ -34,10 +36,25 @@ func (handler *SecretHandler) Get(secretID string) (map[string]interface{}, erro
 	return m, nil
 }
 
-func (handler *SecretHandler) Save(secretID, path string) error {
+func (handler *SecretHandler) Save(secretID, path string, decodeBase64EncodedSecret bool) error {
 	m, err := handler.Get(secretID)
 	if err != nil {
 		return err
+	}
+
+	if decodeBase64EncodedSecret {
+		for key, value := range m {
+			switch t := value.(type) {
+			case string:
+				decodedValue, err := base64.StdEncoding.DecodeString(value.(string))
+				if err != nil {
+					return err
+				}
+				m[key] = decodedValue
+			default:
+				return fmt.Errorf("unsupported type: %T", t)
+			}
+		}
 	}
 
 	file, err := os.Create(path)
