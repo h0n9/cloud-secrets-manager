@@ -78,6 +78,15 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 			})
 		}
 
+		// mount volume to every containers
+		for i := range pod.Spec.Containers {
+			pod.Spec.Containers[i].VolumeMounts = append(pod.Spec.Containers[i].VolumeMounts, corev1.VolumeMount{
+				Name:      injectorName,
+				MountPath: output,
+				SubPath:   filepath.Base(output),
+			})
+		}
+
 		// create init container for injection
 		initContainer := corev1.Container{
 			Name:  injectorName,
@@ -100,15 +109,6 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 
 		// append init container to pod's init containers
 		pod.Spec.InitContainers = append([]corev1.Container{initContainer}, pod.Spec.InitContainers...)
-
-		// mount volume to every containers
-		for i := range pod.Spec.Containers {
-			pod.Spec.Containers[i].VolumeMounts = append(pod.Spec.Containers[i].VolumeMounts, corev1.VolumeMount{
-				Name:      injectorName,
-				MountPath: output,
-				SubPath:   filepath.Base(output),
-			})
-		}
 
 		// set annotation for injection to true
 		injected := "injected"
