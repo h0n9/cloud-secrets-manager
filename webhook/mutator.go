@@ -56,6 +56,10 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 		if err != nil {
 			return admission.Errored(http.StatusBadRequest, err)
 		}
+		decodeB64, err := annotations.GetDecodeB64()
+		if err != nil {
+			return admission.Errored(http.StatusBadRequest, err)
+		}
 
 		// prepare injector name for general use
 		injectorName := "cloud-secrets-injector"
@@ -102,6 +106,7 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 				fmt.Sprintf("--secret-id=%s", secretID),
 				fmt.Sprintf("--template=%s", util.EncodeBase64(tmplStr)),
 				fmt.Sprintf("--output=%s", filepath.Join(csm.InjectorVolumeMountPath, subPath)),
+				fmt.Sprintf("--decode-b64-secret=%t", decodeB64),
 			},
 			VolumeMounts: []corev1.VolumeMount{
 				{
