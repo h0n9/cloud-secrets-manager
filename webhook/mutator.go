@@ -69,8 +69,8 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 			VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
 		})
 
-		// inject sidecar
-		pod.Spec.InitContainers = append(pod.Spec.InitContainers, corev1.Container{
+		// create init container for injection
+		initContainer := corev1.Container{
 			Name:  injectorName,
 			Image: mutator.InjectorImage,
 			Args: []string{
@@ -87,7 +87,10 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 					MountPath: csm.InjectorVolumeMountPath,
 				},
 			},
-		})
+		}
+
+		// append init container to pod's init containers
+		pod.Spec.InitContainers = append([]corev1.Container{initContainer}, pod.Spec.InitContainers...)
 
 		// mount volume to every containers
 		for i := range pod.Spec.Containers {
