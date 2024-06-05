@@ -81,15 +81,15 @@ func TestParseAnnotationSet(t *testing.T) {
 
 func TestAnnotationsIsInjected(t *testing.T) {
 	annotations := Annotations{}
-	assert.False(t, annotations.IsInected())
+	assert.False(t, annotations.IsInjected())
 	annotations = Annotations{"injected": "false"}
-	assert.False(t, annotations.IsInected())
+	assert.False(t, annotations.IsInjected())
 	annotations = Annotations{"injected": "x"}
-	assert.False(t, annotations.IsInected())
+	assert.False(t, annotations.IsInjected())
 	annotations = Annotations{"injected": "ture"}
-	assert.False(t, annotations.IsInected())
+	assert.False(t, annotations.IsInjected())
 	annotations = Annotations{"injected": "t"}
-	assert.True(t, annotations.IsInected())
+	assert.True(t, annotations.IsInjected())
 	annotations = Annotations{"injected": "true"}
-	assert.True(t, annotations.IsInected())
+	assert.True(t, annotations.IsInjected())
 }

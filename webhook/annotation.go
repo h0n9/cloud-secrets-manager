@@ -78,7 +78,7 @@ func ParseAndCheckAnnotations(input Annotations) Annotations {
 	return output
 }
 
-func (a Annotations) IsInected() bool {
+func (a Annotations) IsInjected() bool {
 	value, exist := a[AnnotationInjected]
 	if !exist {
 		return false
