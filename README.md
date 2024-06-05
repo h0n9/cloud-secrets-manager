@@ -82,14 +82,14 @@ of other new charts.
 The following annotatins are required to inject `cloud-secrets-injector` into
 pods:
 
-| **Key**                                                | **Required** | **Description**              | **Example**                                              |
-|--------------------------------------------------------|--------------|------------------------------|----------------------------------------------------------|
-| `cloud-secrets-manager.h0n9.postie.chat/provider`      | true         | Cloud Provider Name          | `aws`                                                    |
-| `cloud-secrets-manager.h0n9.postie.chat/secret-id`     | true         | Secret Name                  | `very-precious-secret`                                   |
-| `cloud-secrets-manager.h0n9.postie.chat/template`      | true         | Template for secret value    | ```{{ range $k, $v := . }}{{ $k }}={{ $v }} {{ end }}``` |
-| `cloud-secrets-manager.h0n9.postie.chat/output`        | true         | File path for output         | `/secrets/env`                                           |
-| `cloud-secrets-manager.h0n9.postie.chat/decode-base64` | false        | Decode base64-encoded string | `true` or `false`                                        |
-| `cloud-secrets-manager.h0n9.postie.chat/injected`      | false        | Identifier for injection     | `false`                                                  |
+| **Key**                                                | **Required** | **Description**                    | **Example**                                              |
+|--------------------------------------------------------|--------------|------------------------------------|----------------------------------------------------------|
+| `cloud-secrets-manager.h0n9.postie.chat/provider`      | true         | Cloud Provider Name                | `aws`                                                    |
+| `cloud-secrets-manager.h0n9.postie.chat/secret-id`     | true         | Secret Name                        | `very-precious-secret`                                   |
+| `cloud-secrets-manager.h0n9.postie.chat/template`      | true         | Template for secret value          | ```{{ range $k, $v := . }}{{ $k }}={{ $v }} {{ end }}``` |
+| `cloud-secrets-manager.h0n9.postie.chat/output`        | true         | File path for output               | `/secrets/env`                                           |
+| `cloud-secrets-manager.h0n9.postie.chat/decode-base64` | false        | Decode base64-encoded secret value | `true` or `false`                                        |
+| `cloud-secrets-manager.h0n9.postie.chat/injected`      | false        | Identifier for injection           | `false`                                                  |
 
 #### Annotations for Multiple Secrets Injection
 
