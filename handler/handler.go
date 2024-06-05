@@ -1,13 +1,13 @@
 package handler
 
 import (
-	"encoding/base64"
+	"bytes"
 	"encoding/json"
-	"fmt"
 	"os"
 	"text/template"
 
 	"github.com/h0n9/cloud-secrets-manager/provider"
+	"github.com/h0n9/cloud-secrets-manager/util"
 )
 
 type SecretHandlerFunc func(string) (string, error)
@@ -37,31 +37,42 @@ func (handler *SecretHandler) Get(secretID string) (map[string]interface{}, erro
 }
 
 func (handler *SecretHandler) Save(secretID, path string, decodeBase64EncodedSecret bool) error {
+	// get secret
 	m, err := handler.Get(secretID)
 	if err != nil {
 		return err
 	}
 
-	if decodeBase64EncodedSecret {
-		for key, value := range m {
-			switch t := value.(type) {
-			case string:
-				decodedValue, err := base64.StdEncoding.DecodeString(value.(string))
-				if err != nil {
-					return err
-				}
-				m[key] = decodedValue
-			default:
-				return fmt.Errorf("unsupported type: %T", t)
-			}
-		}
-	}
-
+	// create file
 	file, err := os.Create(path)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	return handler.template.Execute(file, m)
+	// if secret is not base64 encoded, write it to file and return
+	if !decodeBase64EncodedSecret {
+		return handler.template.Execute(file, m)
+	}
+
+	var (
+		buff          bytes.Buffer
+		decodedSecret []byte
+	)
+
+	// execute template
+	err = handler.template.Execute(&buff, m)
+	if err != nil {
+		return err
+	}
+
+	// decode base64 encoded secret
+	decodedSecret, err = util.DecodeBase64StrToBytes(buff.String())
+	if err != nil {
+		return err
+	}
+
+	// write decoded secret to file
+	_, err = file.Write(decodedSecret)
+	return err
 }
