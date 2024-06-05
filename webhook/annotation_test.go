@@ -20,6 +20,7 @@ func TestParseAndCheckAnnotations(t *testing.T) {
 		"cloud-secrets-manager.h0n9.postie.chat/output":             "/envs",             // ✅
 		"cloud-secrets-manager.h0n9.postie.chat/template":           SampleTemplate,      // ✅
 		"cloud-secrets-manager.h0n9.postie.chat/injected":           "true",              // ✅
+		"cloud-secrets-manager.h0n9.postie.chat/decode-base64":      "true",              // ✅
 		"cloud-secrets-manager.h0n9.posite.chat/template":           SampleTemplate,      // ❌: typo
 		"cloud-secrets-manager.h0n9.postie.chat/volume-path":        "/envs",             // ❌: unsupported
 		"cloud-secrets-manager.h0n9.postie.chat":                    "h0n9",              // ❌: non subpath
@@ -27,11 +28,12 @@ func TestParseAndCheckAnnotations(t *testing.T) {
 	}
 	output := ParseAndCheckAnnotations(input)
 	expectedOutput := Annotations{
-		"provider":  "aws",
-		"secret-id": "life-is-beautiful",
-		"template":  SampleTemplate,
-		"output":    "/envs",
-		"injected":  "true",
+		"provider":      "aws",
+		"secret-id":     "life-is-beautiful",
+		"template":      SampleTemplate,
+		"output":        "/envs",
+		"decode-base64": "true",
+		"injected":      "true",
 	}
 	assert.EqualValues(t, expectedOutput, output)
 }
@@ -43,6 +45,7 @@ func TestParseAnnotationSet(t *testing.T) {
 		"cloud-secrets-manager.h0n9.postie.chat/output":             "/envs",             // ✅
 		"cloud-secrets-manager.h0n9.postie.chat/template":           SampleTemplate,      // ✅
 		"cloud-secrets-manager.h0n9.postie.chat/injected":           "true",              // ✅
+		"cloud-secrets-manager.h0n9.postie.chat/decode-base64":      "true",              // ✅
 		"cloud-secrets-manager.h0n9.posite.chat/template":           SampleTemplate,      // ❌: typo
 		"cloud-secrets-manager.h0n9.postie.chat/volume-path":        "/envs",             // ❌: unsupported
 		"cloud-secrets-manager.h0n9.postie.chat":                    "h0n9",              // ❌: non subpath
@@ -52,22 +55,25 @@ func TestParseAnnotationSet(t *testing.T) {
 		"cloud-secrets-manager.h0n9.postie.chat/output-test":        "/secrets/envs",     // ✅
 		"cloud-secrets-manager.h0n9.postie.chat/template-test":      SampleTemplate,      // ✅
 		"cloud-secrets-manager.h0n9.postie.chat/injected-test":      "false",             // ✅
+		"cloud-secrets-manager.h0n9.postie.chat/decode-base64-test": "false",             // ✅
 	}
 	output := ParseAnnotationSet(input)
 	expectedOutput := AnnotationSet{
 		"": Annotations{
-			"provider":  "aws",
-			"secret-id": "life-is-beautiful",
-			"template":  SampleTemplate,
-			"output":    "/envs",
-			"injected":  "true",
+			"provider":      "aws",
+			"secret-id":     "life-is-beautiful",
+			"template":      SampleTemplate,
+			"output":        "/envs",
+			"decode-base64": "true",
+			"injected":      "true",
 		},
 		"test": Annotations{
-			"provider":  "gcp",
-			"secret-id": "life-is-wonderful",
-			"template":  SampleTemplate,
-			"output":    "/secrets/envs",
-			"injected":  "false",
+			"provider":      "gcp",
+			"secret-id":     "life-is-wonderful",
+			"template":      SampleTemplate,
+			"output":        "/secrets/envs",
+			"decode-base64": "false",
+			"injected":      "false",
 		},
 	}
 	assert.EqualValues(t, expectedOutput, output)
