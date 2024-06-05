@@ -117,7 +117,8 @@ func (a Annotations) GetOutput() (string, error) {
 func (a Annotations) GetDecodeB64() (bool, error) {
 	value, err := a.getValue(AnnotationDecodeB64)
 	if err != nil {
-		return false, err
+		// default value and no error
+		return false, nil
 	}
 	return strconv.ParseBool(value)
 }
