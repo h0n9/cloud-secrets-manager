@@ -104,7 +104,7 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 				"run",
 				fmt.Sprintf("--provider=%s", providerStr),
 				fmt.Sprintf("--secret-id=%s", secretID),
-				fmt.Sprintf("--template=%s", util.EncodeBase64(tmplStr)),
+				fmt.Sprintf("--template=%s", util.EncodeBase64StrToStr(tmplStr)),
 				fmt.Sprintf("--output=%s", filepath.Join(csm.InjectorVolumeMountPath, subPath)),
 				fmt.Sprintf("--decode-b64-secret=%t", decodeB64),
 			},

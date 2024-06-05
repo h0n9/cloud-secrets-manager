@@ -16,7 +16,7 @@ var decodeCmd = &cobra.Command{
 		if args[0] == "" {
 			return fmt.Errorf("failed to decode empty string")
 		}
-		template, err := util.DecodeBase64(args[0])
+		template, err := util.DecodeBase64StrToStr(args[0])
 		if err != nil {
 			return err
 		}

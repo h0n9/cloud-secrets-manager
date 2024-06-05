@@ -59,7 +59,7 @@ var runCmd = &cobra.Command{
 		logger.Info().Msg("read environment variables")
 
 		// decode base64-encoded template to string
-		templateStr, err := util.DecodeBase64(templateBase64)
+		templateStr, err := util.DecodeBase64StrToStr(templateBase64)
 		if err != nil {
 			return err
 		}
