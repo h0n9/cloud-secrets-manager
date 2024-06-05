@@ -13,16 +13,20 @@ func GetEnv(key, fallback string) string {
 	return fallback
 }
 
-func EncodeBase64(input string) string {
+func EncodeBase64StrToStr(input string) string {
 	return base64.RawStdEncoding.EncodeToString([]byte(input))
 }
 
-func DecodeBase64(input string) (string, error) {
-	output, err := base64.RawStdEncoding.DecodeString(input)
+func DecodeBase64StrToStr(input string) (string, error) {
+	output, err := DecodeBase64StrToBytes(input)
 	if err != nil {
 		return "", err
 	}
 	return string(output), nil
+}
+
+func DecodeBase64StrToBytes(input string) ([]byte, error) {
+	return base64.RawStdEncoding.DecodeString(input)
 }
 
 func ReadFileToBytes(filename string) ([]byte, error) {
