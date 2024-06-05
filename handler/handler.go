@@ -55,24 +55,24 @@ func (handler *SecretHandler) Save(secretID, path string, decodeBase64EncodedSec
 		return handler.template.Execute(file, m)
 	}
 
-	var (
-		buff          bytes.Buffer
-		decodedSecret []byte
-	)
-
 	// execute template
+	var buff bytes.Buffer
 	err = handler.template.Execute(&buff, m)
 	if err != nil {
 		return err
 	}
 
 	// decode base64 encoded secret
-	decodedSecret, err = util.DecodeBase64StrToBytes(buff.String())
+	decodedSecret, err := util.DecodeBase64BytesToBytes(buff.Bytes())
 	if err != nil {
 		return err
 	}
 
 	// write decoded secret to file
 	_, err = file.Write(decodedSecret)
-	return err
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
