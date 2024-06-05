@@ -118,6 +118,29 @@ cloud-secrets-manager.h0n9.postie.chat/template-config-secrets: |
 Just add `<secret-name>` at the end of each annotation key, like
 `cloud-secrets-manager.h0n9.postie.chat/provider-<secret-name>`. That's it!
 
+#### Annotation for Decoding Base64-encoded Secret Value
+
+From the version `v0.6`, you can decode base64-encoded secret values by setting
+the `cloud-secrets-manager.h0n9.postie.chat/decode-base64` annotation to `true`.
+
+```yaml
+cloud-secrets-manager.h0n9.postie.chat/provider-cert: aws
+cloud-secrets-manager.h0n9.postie.chat/secret-id-cert: very-precious-secret
+cloud-secrets-manager.h0n9.postie.chat/output-cert: /secrets/precious.cer
+cloud-secrets-manager.h0n9.postie.chat/template-cert: |
+  {{ .base64-encoded-precious-cert }}
+cloud-secrets-manager.h0n9.postie.chat/decode-base64-cert: "true"
+cloud-secrets-manager.h0n9.postie.chat/provider-key: aws
+cloud-secrets-manager.h0n9.postie.chat/secret-id-key: very-precious-secret
+cloud-secrets-manager.h0n9.postie.chat/output-key: /secrets/precious.key
+cloud-secrets-manager.h0n9.postie.chat/template-key: |
+  {{ .base64-encoded-precious-key }}
+cloud-secrets-manager.h0n9.postie.chat/decode-base64-key: "true"
+```
+
+This feature is useful when you want to inject a base64-encoded secret value as
+a file into a pod.
+
 ### Providers
 
 Supported providers require the annotations mentioned above in common. However,
