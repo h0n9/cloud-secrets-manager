@@ -29,6 +29,15 @@ func DecodeBase64StrToBytes(input string) ([]byte, error) {
 	return base64.RawStdEncoding.DecodeString(input)
 }
 
+func DecodeBase64BytesToBytes(input []byte) ([]byte, error) {
+	output := make([]byte, base64.StdEncoding.DecodedLen(len(input)))
+	n, err := base64.StdEncoding.Decode(output, input)
+	if err != nil {
+		return nil, err
+	}
+	return output[:n], nil
+}
+
 func ReadFileToBytes(filename string) ([]byte, error) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
