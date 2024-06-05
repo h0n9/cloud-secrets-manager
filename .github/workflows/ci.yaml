@@ -9,6 +9,8 @@ on:
       - v*
     paths-ignore:
       - ".github/**"
+      - "docs/**"
+      - "*.md"
 env:
   img-registry: ghcr.io/h0n9
   img-repository: cloud-secrets-manager
