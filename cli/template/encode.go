@@ -16,7 +16,7 @@ var encodeCmd = &cobra.Command{
 		if args[0] == "" {
 			return fmt.Errorf("failed to encode empty string")
 		}
-		fmt.Println(util.EncodeBase64(args[0]))
+		fmt.Println(util.EncodeBase64StrToStr(args[0]))
 		return nil
 	},
 }

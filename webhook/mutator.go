@@ -35,7 +35,7 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 	}
 
 	for secretName, annotations := range annotationSet {
-		if annotations.IsInected() {
+		if annotations.IsInjected() {
 			// return admission.Allowed("do nothing as secrets are already injected")
 			continue
 		}
@@ -53,6 +53,10 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 			return admission.Errored(http.StatusBadRequest, err)
 		}
 		output, err := annotations.GetOutput()
+		if err != nil {
+			return admission.Errored(http.StatusBadRequest, err)
+		}
+		decodeB64, err := annotations.GetDecodeB64()
 		if err != nil {
 			return admission.Errored(http.StatusBadRequest, err)
 		}
@@ -100,8 +104,9 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 				"run",
 				fmt.Sprintf("--provider=%s", providerStr),
 				fmt.Sprintf("--secret-id=%s", secretID),
-				fmt.Sprintf("--template=%s", util.EncodeBase64(tmplStr)),
+				fmt.Sprintf("--template=%s", util.EncodeBase64StrToStr(tmplStr)),
 				fmt.Sprintf("--output=%s", filepath.Join(csm.InjectorVolumeMountPath, subPath)),
+				fmt.Sprintf("--decode-b64-secret=%t", decodeB64),
 			},
 			VolumeMounts: []corev1.VolumeMount{
 				{
