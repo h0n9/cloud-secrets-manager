@@ -35,7 +35,7 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 	}
 
 	for secretName, annotations := range annotationSet {
-		if annotations.IsInected() {
+		if annotations.IsInjected() {
 			// return admission.Allowed("do nothing as secrets are already injected")
 			continue
 		}
@@ -56,6 +56,10 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 		if err != nil {
 			return admission.Errored(http.StatusBadRequest, err)
 		}
+		decodeB64, err := annotations.GetDecodeB64()
+		if err != nil {
+			return admission.Errored(http.StatusBadRequest, err)
+		}
 
 		// prepare injector name for general use
 		injectorName := "cloud-secrets-injector"
@@ -69,8 +73,30 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 			VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
 		})
 
-		// inject sidecar
-		pod.Spec.InitContainers = append(pod.Spec.InitContainers, corev1.Container{
+		// prepare mount path for general use
+		mountPath := output
+		subPath := filepath.Base(mountPath)
+
+		// mount volume to every init containers
+		for i := range pod.Spec.InitContainers {
+			pod.Spec.InitContainers[i].VolumeMounts = append(pod.Spec.InitContainers[i].VolumeMounts, corev1.VolumeMount{
+				Name:      injectorName,
+				MountPath: mountPath,
+				SubPath:   subPath,
+			})
+		}
+
+		// mount volume to every containers
+		for i := range pod.Spec.Containers {
+			pod.Spec.Containers[i].VolumeMounts = append(pod.Spec.Containers[i].VolumeMounts, corev1.VolumeMount{
+				Name:      injectorName,
+				MountPath: mountPath,
+				SubPath:   subPath,
+			})
+		}
+
+		// create init container for injection
+		initContainer := corev1.Container{
 			Name:  injectorName,
 			Image: mutator.InjectorImage,
 			Args: []string{
@@ -78,8 +104,9 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 				"run",
 				fmt.Sprintf("--provider=%s", providerStr),
 				fmt.Sprintf("--secret-id=%s", secretID),
-				fmt.Sprintf("--template=%s", util.EncodeBase64(tmplStr)),
-				fmt.Sprintf("--output=%s", filepath.Join(csm.InjectorVolumeMountPath, filepath.Base(output))),
+				fmt.Sprintf("--template=%s", util.EncodeBase64StrToStr(tmplStr)),
+				fmt.Sprintf("--output=%s", filepath.Join(csm.InjectorVolumeMountPath, subPath)),
+				fmt.Sprintf("--decode-b64-secret=%t", decodeB64),
 			},
 			VolumeMounts: []corev1.VolumeMount{
 				{
@@ -87,16 +114,10 @@ func (mutator *Mutator) Handle(ctx context.Context, req admission.Request) admis
 					MountPath: csm.InjectorVolumeMountPath,
 				},
 			},
-		})
-
-		// mount volume to every containers
-		for i := range pod.Spec.Containers {
-			pod.Spec.Containers[i].VolumeMounts = append(pod.Spec.Containers[i].VolumeMounts, corev1.VolumeMount{
-				Name:      injectorName,
-				MountPath: output,
-				SubPath:   filepath.Base(output),
-			})
 		}
+
+		// append init container to pod's init containers
+		pod.Spec.InitContainers = append([]corev1.Container{initContainer}, pod.Spec.InitContainers...)
 
 		// set annotation for injection to true
 		injected := "injected"

@@ -82,13 +82,14 @@ of other new charts.
 The following annotatins are required to inject `cloud-secrets-injector` into
 pods:
 
-| **Key**                                            | **Required** | **Description**           | **Example**                                              |
-|----------------------------------------------------|--------------|---------------------------|----------------------------------------------------------|
-| `cloud-secrets-manager.h0n9.postie.chat/provider`  | true         | Cloud Provider Name       | `aws`                                                    |
-| `cloud-secrets-manager.h0n9.postie.chat/secret-id` | true         | Secret Name               | `very-precious-secret`                                   |
-| `cloud-secrets-manager.h0n9.postie.chat/template`  | true         | Template for secret value | ```{{ range $k, $v := . }}{{ $k }}={{ $v }} {{ end }}``` |
-| `cloud-secrets-manager.h0n9.postie.chat/output`    | true         | File path for output      | `/secrets/env`                                           |
-| `cloud-secrets-manager.h0n9.postie.chat/injected`  | false        | Identifier for injection  | `false`                                                  |
+| **Key**                                                | **Required** | **Description**                    | **Example**                                              |
+|--------------------------------------------------------|--------------|------------------------------------|----------------------------------------------------------|
+| `cloud-secrets-manager.h0n9.postie.chat/provider`      | true         | Cloud Provider Name                | `aws`                                                    |
+| `cloud-secrets-manager.h0n9.postie.chat/secret-id`     | true         | Secret Name                        | `very-precious-secret`                                   |
+| `cloud-secrets-manager.h0n9.postie.chat/template`      | true         | Template for secret value          | ```{{ range $k, $v := . }}{{ $k }}={{ $v }} {{ end }}``` |
+| `cloud-secrets-manager.h0n9.postie.chat/output`        | true         | File path for output               | `/secrets/env`                                           |
+| `cloud-secrets-manager.h0n9.postie.chat/decode-base64` | false        | Decode base64-encoded secret value | `true` or `false`                                        |
+| `cloud-secrets-manager.h0n9.postie.chat/injected`      | false        | Identifier for injection           | `false`                                                  |
 
 #### Annotations for Multiple Secrets Injection
 
@@ -117,6 +118,29 @@ cloud-secrets-manager.h0n9.postie.chat/template-config-secrets: |
 Just add `<secret-name>` at the end of each annotation key, like
 `cloud-secrets-manager.h0n9.postie.chat/provider-<secret-name>`. That's it!
 
+#### Annotation for Decoding Base64-encoded Secret Value
+
+From the version `v0.6`, you can decode base64-encoded secret values by setting
+the `cloud-secrets-manager.h0n9.postie.chat/decode-base64` annotation to `true`.
+
+```yaml
+cloud-secrets-manager.h0n9.postie.chat/provider-cert: aws
+cloud-secrets-manager.h0n9.postie.chat/secret-id-cert: very-precious-secret
+cloud-secrets-manager.h0n9.postie.chat/output-cert: /secrets/precious.cer
+cloud-secrets-manager.h0n9.postie.chat/template-cert: |
+  {{ .base64-encoded-precious-cert }}
+cloud-secrets-manager.h0n9.postie.chat/decode-base64-cert: "true"
+cloud-secrets-manager.h0n9.postie.chat/provider-key: aws
+cloud-secrets-manager.h0n9.postie.chat/secret-id-key: very-precious-secret
+cloud-secrets-manager.h0n9.postie.chat/output-key: /secrets/precious.key
+cloud-secrets-manager.h0n9.postie.chat/template-key: |
+  {{ .base64-encoded-precious-key }}
+cloud-secrets-manager.h0n9.postie.chat/decode-base64-key: "true"
+```
+
+This feature is useful when you want to inject a base64-encoded secret value as
+a file into a pod.
+
 ### Providers
 
 Supported providers require the annotations mentioned above in common. However,
@@ -130,23 +154,25 @@ following explanation.
 
 #### Installation
 
-As Cloud Secrets Manager is available as a Docker image, there is no need to
-install the CLI tool. Just run the Docker container as follows:
+Cloud Secrets Manager can be installed via Homebrew:
 
 ```bash
-$ dokcer pull ghcr.io/h0n9/cloud-secrets-manager:latest
+$ brew install h0n9/devops/cloud-secrets-manager
 ```
 
-You can change the tag to a specific version if you want like following:
+That's it! You can now use the `cloud-secrets-manager` or `csm` commands.
+
+> For `aws-vault` users, you can use the following command to execute the
+`cloud-secrets-manager` command with the specified AWS profile:
 
 ```bash
-$ dokcer pull ghcr.io/h0n9/cloud-secrets-manager:v0.5
+$ aws-vault exec <profile> -- csm <command>
 ```
 
 #### List Secrets
 
 ```bash
-$ docker run --rm -it ghcr.io/h0n9/cloud-secrets-manager:latest secrets list --provider aws --limit 3
+$ csm secrets list --provider aws --limit 3
 dev/hello-world
 dev/very-precious-secret
 dev/another-secret
@@ -156,7 +182,7 @@ The `--limit` option is available to limit the number of secrets to be listed.
 #### Edit Secret
 
 ```bash
-$ docker run --rm -it ghcr.io/h0n9/cloud-secrets-manager:latest secrets edit --provider aws --secret-id dev/very-precious-secret
+$ csm secrets edit --provider aws --secret-id dev/very-precious-secret
 ```
 
 A text editor will be opened with the secret value. After editing, save and
@@ -167,5 +193,5 @@ If you want to use a specific editor, set the `EDITOR` environment variable.
 
 ```bash
 $ export EDITOR=nano
-$ docker run --rm -it ghcr.io/h0n9/cloud-secrets-manager:latest secrets edit --provider aws --secret-id dev/very-precious-secret
+$ csm secrets edit --provider aws --secret-id dev/very-precious-secret
 ```
