@@ -10,7 +10,7 @@ make secret management easier than using the Cloud Console. If you want to jump
 into the CLI tool, please refer to the [CLI Tool](#cli-tool) section right away.
 
 ## Contents
-- [Supported Cloud Providers](#cloud-providers)
+- [Supported Cloud Providers](#supported-cloud-providers)
   - [Current](#current)
   - [Planned](#planned)
 - [Concept](#concept)
