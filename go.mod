@@ -1,6 +1,6 @@
 module github.com/h0n9/cloud-secrets-manager
 
-go 1.23.11
+go 1.25.0
 
 require (
 	cloud.google.com/go/secretmanager v1.10.0
