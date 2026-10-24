@@ -6,6 +6,7 @@ on:
       - main
       - develop
       - feature/*
+      - chore/*
     tags:
       - v*
     paths-ignore:
