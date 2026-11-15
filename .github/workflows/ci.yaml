@@ -7,6 +7,7 @@ on:
       - develop
       - feature/*
       - chore/*
+      - dependabot/*
     tags:
       - v*
     paths-ignore:
